@@ -1,0 +1,11 @@
+# this is an example of a 1D data input
+5
+2
+1
+4
+1
+9
+0
+3
+8
+9
