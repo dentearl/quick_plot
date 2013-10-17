@@ -1,6 +1,6 @@
 # quick_plot
 
-**quick_plot** is a Python script that uses matplotlib to create simple visualizations of data from the command line.
+**quick_plot** is a python script that uses matplotlib to create simple visualizations of data from the command line.
 
 ## Author
 [Dent Earl](https://github.com/dentearl/)
