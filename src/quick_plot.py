@@ -501,7 +501,6 @@ def PlotPoints(data_list, ax, args):
   data_min = min(map(numpy.min, map(lambda x: x.data[1], data_list)))
   data_max = max(map(numpy.max, map(lambda x: x.data[1], data_list)))
   data_range = data_max - data_min
-  print data_min, data_max, data_range
   if data_range == 0.0:
     data_min, data_max, data_range = -0.5, 0.5, 1.0
   data_min -= data_range * 0.1
@@ -522,7 +521,6 @@ def PlotPoints(data_list, ax, args):
   ax.set_xlim([data_min, data_max])
   ax.yaxis.set_ticks_position('none')
   ax.yaxis.set_ticks([])
-  print 'this is really fucking frustrating'
 
 
 def PlotData(data_list, ax, args):
