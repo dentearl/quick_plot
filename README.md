@@ -62,7 +62,7 @@ The input file may contain comment lines (lines that start with #). Files may co
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_2.png)
 
-Plotting 2D line data, two files.
+### Plotting 2D line data, two files.
 
     bin/quick_plot example/data_2d_3.txt example/data_2d_4.txt --mode line --out_format png --out img/example_3.png
 
