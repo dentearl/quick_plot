@@ -286,7 +286,7 @@ def PlotTwoDimension(data_list, ax, args):
       data.data[1].sort()
       rxlist = numpy.array(data.data[0])
       rylist = numpy.array(data.data[1])
-      A = numpy.array([xlist, numpy.ones(len(rxlist))])
+      A = numpy.array([rxlist, numpy.ones(len(rxlist))])
       try:
         w = numpy.linalg.lstsq(A.T, rylist)[0]
       except ValueError:
