@@ -20,6 +20,9 @@ The input file may contain comment lines (lines that start with #). Files may co
 ## Usage
     usage: quick_plot input_file1 input_file2 ... [options]
 
+    quick_plot is a tool to produce quick plots. col1 of input file is x value col2 is y
+    value. If the --mode is column/bar/hist then only col1 is used.
+
     positional arguments:
     files                 files to plot
     optional arguments:
@@ -31,13 +34,17 @@ The input file may contain comment lines (lines that start with #). Files may co
     --alpha ALPHA         alpha value for markers in --mode scatter
     --dot_size MARKERSIZE, --markersize MARKERSIZE
                           value for markers in --mode scatter
-    --lineWidth LINEWIDTH
+    --linewidth LINEWIDTH
                           Line width for the plot. default=2.0
     --logy                Put the y-axis into log. default=False
     --logx                Put the x-axis into log. default=False
     --title TITLE         Plot title.
     --xlabel XLABEL       X-axis label.
     --ylabel YLABEL       Y-axis label.
+    --xmin USER_XMIN      xmin value.
+    --xmax USER_XMAX      xmax value.
+    --ymin USER_YMIN      ymin value.
+    --ymax USER_YMAX      ymax value.
     --height HEIGHT       height of image, in inches. default=4.0
     --width WIDTH         width of image, in inches. default=9.0
     --dpi DPI             dots per inch of raster outputs, i.e. if --outFormat is all or png.
