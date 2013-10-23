@@ -75,14 +75,14 @@ def InitArguments(parser):
                             'extension needed. default=%(default)s'))
   parser.add_argument('--mode', dest='mode', default='line', type=str,
                       help=('plotting mode. may be in (line, scatter, '
-                            'column, bar, hist, tick, point) '
+                            'column, bar, hist, tick, barcode, point) '
                             'default=%(default)s'))
   parser.add_argument('--alpha', default=1.0, type=float,
                       help='alpha value for markers in --mode scatter')
   parser.add_argument('--dot_size', '--markersize', dest='markersize',
                       default=2.0, type=float,
                       help='value for markers in --mode scatter')
-  parser.add_argument('--lineWidth', dest='linewidth', default=2.0,
+  parser.add_argument('--linewidth', dest='linewidth', default=2.0,
                       type=float,
                       help='Line width for the plot. default=%(default)s')
   parser.add_argument('--logy', dest='is_log_y', default=False,
@@ -100,6 +100,18 @@ def InitArguments(parser):
   parser.add_argument('--ylabel', dest='ylabel', type=str,
                       default='sentinel_value',
                       help='Y-axis label.')
+  parser.add_argument(
+    '--xmin', dest='user_xmin', default=sys.maxint, type=float,
+    help='xmin value.')
+  parser.add_argument(
+    '--xmax', dest='user_xmax', default=-sys.maxint, type=float,
+    help='xmax value.')
+  parser.add_argument(
+    '--ymin', dest='user_ymin', default=sys.maxint, type=float,
+    help='ymin value.')
+  parser.add_argument(
+    '--ymax', dest='user_ymax', default=-sys.maxint, type=float,
+    help='ymax value.')
   parser.add_argument('--height', dest='height', default=4.0, type=float,
                       help='height of image, in inches. default=%(default)s')
   parser.add_argument('--width', dest='width', default=9.0, type=float,
@@ -145,16 +157,16 @@ def CheckArguments(args, parser):
     parser.error('Unrecognized --out_format %s. Choose one from: '
                  'pdf png eps all.' % args.out_format)
   if args.mode not in ('line', 'scatter', 'bar', 'column', 'hist',
-                       'tick', 'point'):
+                       'tick', 'barcode', 'point'):
     parser.error('Unrecognized --mode %s. Choose one from: '
-                 'line scatter bar column hist tick point.' % args.mode)
+                 'line scatter bar column hist tick barcode point.' % args.mode)
   if (args.out.endswith('.png') or args.out.endswith('.pdf') or
       args.out.endswith('.eps')):
     args.out = args.out[:-4]
+  args.xmax = -sys.maxint
+  args.xmin = sys.maxint
   args.ymax = -sys.maxint
   args.ymin = sys.maxint
-  args.xmax = args.ymax
-  args.xmin = args.ymin
   # TODO: allow for a way to override the color list
   args.color_list = ['#1f77b4', # d blue
                      '#aec7e8', # l blue
@@ -369,7 +381,7 @@ def PlotOneDimension(data_list, ax, args):
     PlotColumns(data_list, ax, args)
   elif args.mode == 'hist':
     PlotHistogram(data_list, ax, args)
-  elif args.mode == 'tick':
+  elif args.mode == 'tick' or args.mode == 'barcode':
     PlotTicks(data_list, ax, args)
   elif args.mode == 'point':
     PlotPoints(data_list, ax, args)
@@ -439,6 +451,27 @@ def GetTickYValues(i, args):
     return i, i + 0.8
 
 
+def HandleLimits(data_min, data_max, user_min, user_max):
+  """Decides whether to use the data values or user supplied values.
+
+  Args:
+    data_min: minimum value from the data
+    data_max: maximum value from the data
+    user_min: possibly a user requested value for min
+    user_max: possibly a user requested value for max
+
+  Returns:
+    a_min: the correct minimum
+    a_max: the correct maximum
+  """
+  a_min, a_max = data_min, data_max
+  if user_min != sys.maxint:
+    a_min = user_min
+  if user_max != -sys.maxint:
+    a_max = user_max
+  return a_min, a_max
+
+
 def PlotTicks(data_list, ax, args):
   """Plot one dimensional data as tick marks on a line.
 
@@ -467,8 +500,12 @@ def PlotTicks(data_list, ax, args):
                      markeredgecolor='None',
                      alpha=args.alpha,
                      linewidth=args.linewidth))
-  ax.set_ylim([0.0, len(data_list)])
-  ax.set_xlim([data_min, data_max])
+  ymin, ymax = HandleLimits(0.0, len(data_list),
+                            args.user_ymin, args.user_ymax)
+  ax.set_ylim([ymin, ymax])
+  xmin, xmax = HandleLimits(data_min, data_max,
+                            args.user_xmin, args.user_xmax)
+  ax.set_xlim([xmin, xmax])
   ax.yaxis.set_ticks_position('none')
   ax.yaxis.set_ticks([])
 
@@ -517,7 +554,11 @@ def PlotPoints(data_list, ax, args):
                    markeredgecolor='None',
                    alpha=args.alpha,
                    linewidth=0.0))
+  ymin, ymax = HandleLimits(-0.5, len(data_list),
+                             args.user_ymin, args.user_ymax)
   ax.set_ylim([-0.5, len(data_list)])
+  xmin, xmax = HandleLimits(data_min, data_max,
+                            args.user_xmin, args.user_xmax)
   ax.set_xlim([data_min, data_max])
   ax.yaxis.set_ticks_position('none')
   ax.yaxis.set_ticks([])
@@ -533,7 +574,7 @@ def PlotData(data_list, ax, args):
   """
   if args.mode in ('scatter', 'line'):
     PlotTwoDimension(data_list, ax, args)
-  elif args.mode in ('bar', 'column', 'hist', 'tick', 'point'):
+  elif args.mode in ('bar', 'column', 'hist', 'tick', 'barcode', 'point'):
     PlotOneDimension(data_list, ax, args)
 
 
@@ -585,21 +626,28 @@ def CleanAxis(ax, args):
     ax.set_yscale('log')
   else:
     arange = args.ymax - args.ymin
-    if args.mode not in ('hist', 'tick', 'point'):
+    if args.mode not in ('hist', 'tick', 'barcode', 'point'):
+      ymin, ymax = HandleLimits(args.ymin - arange * 0.05,
+                                args.ymax + arange * 0.05,
+                                args.user_ymin, args.user_ymax)
       ax.set_ylim([args.ymin - arange * 0.05, args.ymax + arange * 0.05])
   if args.is_log_x:
     ax.set_xscale('log')
   else:
     arange = args.xmax - args.xmin
-    if args.mode not in ('hist', 'tick', 'point'):
+    if args.mode not in ('hist', 'tick', 'barcode', 'point'):
+      xmin, xmax = HandleLimits(args.xmin - arange * 0.05,
+                                args.xmax + arange * 0.05,
+                                args.user_xmin, args.user_xmax)
       ax.set_xlim([args.xmin - arange * 0.05, args.xmax + arange * 0.05])
   # labels
   if args.xlabel != 'sentinel_value':
     ax.set_xlabel(args.xlabel)
   if args.ylabel != 'sentinel_value':
-    if args.mode in ('tick', 'point'):
-      sys.stderr.write('Warning, --ylabel specified while '
-                       '--mode=tick, ylabel not displayed\n')
+    if args.mode in ('tick', 'barcode', 'point'):
+      sys.stderr.write(
+        'Warning, --ylabel specified while '
+        '--mode=(tick, barcode or point), ylabel not displayed\n')
     else:
       ax.set_ylabel(args.ylabel)
   if args.title != 'sentinel_value':
