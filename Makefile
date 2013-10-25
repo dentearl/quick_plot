@@ -15,11 +15,11 @@ bin/%: src/%.py
 images: all $(image_files)
 
 img/example_1.png: example/data_2d_1.txt
-	bin/quick_plot $^ --mode scatter --markersize 3.0 --out_format png --out $@.tmp --title '2D scatter data from example/data_2d_1.txt' --xlabel 'The x-axis' --ylabel 'The y-axis' --no_legend
+	bin/quick_plot $^ --mode scatter --markersize 7.0 --out_format png --out $@.tmp --title '2D scatter data from example/data_2d_1.txt' --xlabel 'The x-axis' --ylabel 'The y-axis' --no_legend
 	mv $@.tmp.png $@
 
 img/example_2.png: example/data_2d_1.txt example/data_2d_2.txt
-	bin/quick_plot $^ --mode scatter --markersize 3.0 --out_format png --out $@.tmp
+	bin/quick_plot $^ --mode scatter --markersize 7.0 --out_format png --out $@.tmp
 	mv $@.tmp.png $@
 
 img/example_3.png: example/data_2d_3.txt example/data_2d_4.txt

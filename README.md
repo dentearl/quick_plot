@@ -60,13 +60,13 @@ The input file may contain comment lines (lines that start with #). Files may co
 ## Examples
 ### Plotting 2D scatter data, one file, no legend.
 
-    bin/quick_plot example/data_2d_1.txt --mode scatter --markersize 3.0 --out_format png --out img/example_1.png --title '2D scatter data from example/data_2d_1.txt' --xlabel 'The x-axis' --ylabel 'The y-axis' --no_legend
+    bin/quick_plot example/data_2d_1.txt --mode scatter --markersize 7.0 --out_format png --out img/example_1.png --title '2D scatter data from example/data_2d_1.txt' --xlabel 'The x-axis' --ylabel 'The y-axis' --no_legend
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_1.png)
 
 ### Plotting 2D scatter data, two files.
 
-    bin/quick_plot example/data_2d_1.txt example/data_2d_2.txt --mode scatter --markersize 3.0 --out_format png --out img/example_2.png
+    bin/quick_plot example/data_2d_1.txt example/data_2d_2.txt --mode scatter --markersize 7.0 --out_format png --out img/example_2.png
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_2.png)
 
