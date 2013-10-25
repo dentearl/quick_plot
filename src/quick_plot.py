@@ -198,6 +198,7 @@ def CheckArguments(args, parser):
                           '#bcbd22',  # d olive
                           '#17becf',  # d aqua
                          ]
+    args.colors_dark = []
   elif args.colors == 'brewer':
     args.colors_light = [(136, 189, 230),  # l blue
                          (251, 178,  88),  # l orange
@@ -219,12 +220,24 @@ def CheckArguments(args, parser):
                           ( 77,  77,  77),  # m grey
                           (222, 207,  63),  # m yellow
                          ]
+    args.colors_dark = [( 38,  93, 171),  # d blue
+                        (223,  92,  36),  # d orange
+                        (  5, 151,  72),  # d green
+                        (229,  18, 111),  # d red
+                        (157, 114,  42),  # d brown
+                        (123,  58, 150),  # d purple
+                        (203,  32,  39),  # d magenta
+                        (  0,   0,   0),  # black
+                        (199, 180,  46),  # d yellow
+                       ]
     CorrectColorTuples(args)
   elif args.colors == 'mono':
     args.colors_light = [(140, 140, 140),  # l grey
-                         ]
+                        ]
     args.colors_medium = [( 77,  77,  77),  # m grey
                          ]
+    args.colors_dark = [(  0,   0,   0),  # black
+                       ]
     CorrectColorTuples(args)
 
 def CorrectColorTuples(args):
@@ -241,6 +254,10 @@ def CorrectColorTuples(args):
     args.colors_medium[i] = (args.colors_medium[i][0] / 255.0,
                              args.colors_medium[i][1] / 255.0,
                              args.colors_medium[i][2] / 255.0,)
+  for i in xrange(0, len(args.colors_dark)):
+    args.colors_dark[i] = (args.colors_dark[i][0] / 255.0,
+                           args.colors_dark[i][1] / 255.0,
+                           args.colors_dark[i][2] / 255.0,)
 
 
 def InitImage(args):
