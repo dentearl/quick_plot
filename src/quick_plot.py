@@ -332,6 +332,7 @@ def ColorPicker(i, args):
     colors = []
     for i in xrange(0, i):
       colors.append(args.colors_light[i % len(args.colors_light)])
+    return colors
   elif args.mode in ('line', 'scatter', 'tick', 'point', 'barcode'):
     return args.colors_medium[i % len(args.colors_medium)]
 
@@ -674,14 +675,16 @@ def MakeProxyPlots(args):
     for i, afile in enumerate(args.files, 0):
       proxy_plots.append(
         plt.Rectangle(
-          (0, 0), 1, 1, fc=ColorPicker(i, args),
+          (0, 0), 1, 1,
+          fc=ColorPicker(i, args),
           ec=ColorPicker(i, args)))
   else:
     proxy_plots = []
     for i, afile in enumerate(args.files, 0):
       proxy_plots.append(
         plt.Rectangle(
-          (0, 0), 1, 1, fc=ColorPicker(len(args.files), args)[i],
+          (0, 0), 1, 1,
+          fc=ColorPicker(len(args.files), args)[i],
           ec=ColorPicker(len(args.files), args)[i]))
   return proxy_plots
 
