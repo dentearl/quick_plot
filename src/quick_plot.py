@@ -77,6 +77,10 @@ def InitArguments(parser):
                       help=('plotting mode. may be in (line, scatter, '
                             'column, bar, hist, tick, barcode, point) '
                             'default=%(default)s'))
+  parser.add_argument('--colors', dest='colors', default='brewer', type=str,
+                      help=('color palatte mode. may be in (bostock, brewer, '
+                            'mono) '
+                            'default=%(default)s'))
   parser.add_argument('--alpha', default=1.0, type=float,
                       help='alpha value for markers in --mode scatter')
   parser.add_argument('--dot_size', '--markersize', dest='markersize',
@@ -160,6 +164,9 @@ def CheckArguments(args, parser):
                        'tick', 'barcode', 'point'):
     parser.error('Unrecognized --mode %s. Choose one from: '
                  'line scatter bar column hist tick barcode point.' % args.mode)
+  if args.colors not in ('bostock', 'brewer', 'mono'):
+    parser.error('Unrecognized --colors %s palette. Choose one from: '
+                 'bostock brewer mono.' % args.colors)
   if (args.out.endswith('.png') or args.out.endswith('.pdf') or
       args.out.endswith('.eps')):
     args.out = args.out[:-4]
@@ -168,27 +175,72 @@ def CheckArguments(args, parser):
   args.ymax = -sys.maxint
   args.ymin = sys.maxint
   # TODO: allow for a way to override the color list
-  args.color_list = ['#1f77b4', # d blue
-                     '#aec7e8', # l blue
-                     '#ff7f0e', # d orange
-                     '#ffbb78', # l orange
-                     '#2ca02c', # d green
-                     '#98df8a', # l green
-                     '#d62728', # d red
-                     '#ff9896', # l red
-                     '#9467bd', # d purple
-                     '#c5b0d5', # l purple
-                     '#8c564b', # d brown
-                     '#c49c94', # l brown
-                     '#e377c2', # d lavender
-                     '#f7b6d2', # l lavender
-                     '#7f7f7f', # d gray
-                     '#c7c7c7', # l gray
-                     '#bcbd22', # d olive
-                     '#dbdb8d', # l olive
-                     '#17becf', # d aqua
-                     '#9edae5'  # l aqua
-                     ]
+  if args.colors == 'bostock':
+    args.colors_light = ['#aec7e8',  # l blue
+                         '#ffbb78',  # l orange
+                         '#98df8a',  # l green
+                         '#ff9896',  # l red
+                         '#c5b0d5',  # l purple
+                         '#c49c94',  # l brown
+                         '#f7b6d2',  # l lavender
+                         '#c7c7c7',  # l gray
+                         '#dbdb8d',  # l olive
+                         '#9edae5',  # l aqua
+                        ]
+    args.colors_medium = ['#1f77b4',  # d blue
+                          '#ff7f0e',  # d orange
+                          '#2ca02c',  # d green
+                          '#d62728',  # d red
+                          '#9467bd',  # d purple
+                          '#8c564b',  # d brown
+                          '#e377c2',  # d lavender
+                          '#7f7f7f',  # d gray
+                          '#bcbd22',  # d olive
+                          '#17becf',  # d aqua
+                         ]
+  elif args.colors == 'brewer':
+    args.colors_light = [(136, 189, 230),  # l blue
+                         (251, 178,  88),  # l orange
+                         (144, 205, 151),  # l green
+                         (246, 170, 201),  # l red
+                         (191, 165,  84),  # l brown
+                         (188, 153, 199),  # l purple
+                         (240, 126, 110),  # l magenta
+                         (140, 140, 140),  # l grey
+                         (237, 221,  70),  # l yellow
+                        ]
+    args.colors_medium = [( 93, 165, 218),  # m blue
+                          (250, 164,  58),  # m orange
+                          ( 96, 189, 104),  # m green
+                          (241, 124, 167),  # m red
+                          (178, 145,  47),  # m brown
+                          (178, 118, 178),  # m purple
+                          (241,  88,  84),  # m magenta
+                          ( 77,  77,  77),  # m grey
+                          (222, 207,  63),  # m yellow
+                         ]
+    CorrectColorTuples(args)
+  elif args.colors == 'mono':
+    args.colors_light = [(140, 140, 140),  # l grey
+                         ]
+    args.colors_medium = [( 77,  77,  77),  # m grey
+                         ]
+    CorrectColorTuples(args)
+
+def CorrectColorTuples(args):
+  """Corrects the 0-255 values in colors_light and colors_medium to 0.0-1.0
+
+  Args:
+    args: an argparse arguments object
+  """
+  for i in xrange(0, len(args.colors_light)):
+    args.colors_light[i] = (args.colors_light[i][0] / 255.0,
+                            args.colors_light[i][1] / 255.0,
+                            args.colors_light[i][2] / 255.0,)
+  for i in xrange(0, len(args.colors_medium)):
+    args.colors_medium[i] = (args.colors_medium[i][0] / 255.0,
+                             args.colors_medium[i][1] / 255.0,
+                             args.colors_medium[i][2] / 255.0,)
 
 
 def InitImage(args):
@@ -263,6 +315,31 @@ def WriteImage(fig, pdf, args):
     fig.savefig(args.out + '.eps', format='eps')
 
 
+def ColorPicker(i, args):
+  """Returns a valid matplotlib color based on the index, plot mode and palette
+
+  Args:
+    i: index, integer
+    args: an argparse arguments object
+
+  Returns:
+    color: a valid matplotlib color
+  """
+  if args.mode in ('column', 'bar'):
+    return args.colors_light[i % len(args.colors_light)]
+  elif args.mode in ('hist'):
+    # hist requires a list of colors be returned
+    if len(args.colors_light) < i:
+      return args.colors_light[0:i]
+    else:
+      colors = []
+      for i in xrange(0, i):
+        colors.append(args.colors_light[i % len(args.colors_light)])
+      return colors
+  elif args.mode in ('line', 'scatter', 'tick', 'point', 'barcode'):
+    return args.colors_medium[i % len(args.colors_medium)]
+
+
 def PlotTwoDimension(data_list, ax, args):
   """Plot two dimensional data.
 
@@ -284,10 +361,10 @@ def PlotTwoDimension(data_list, ax, args):
     ax.add_line(
       lines.Line2D(xdata=data.data[0],
                    ydata=data.data[1],
-                   color=args.color_list[i],
+                   color=ColorPicker(i, args),
                    marker=marker,
                    markersize=args.markersize,
-                   markerfacecolor=args.color_list[i],
+                   markerfacecolor=ColorPicker(i, args),
                    markeredgecolor='None',
                    alpha=alpha,
                    linewidth=args.linewidth))
@@ -398,7 +475,7 @@ def PlotHistogram(data_list, ax, args):
   for data in data_list:
     datas.append(data.data[1])
   n, bins, patch_groups = ax.hist(
-    datas, color=args.color_list[0:len(datas)], histtype='bar')
+    datas, color=ColorPicker(len(datas), args), histtype='bar')
   for pg in patch_groups:
     if isinstance(pg, matplotlib.container.BarContainer):
       # if there are multiple files, pg will be a BarContainer
@@ -428,7 +505,7 @@ def PlotColumns(data_list, ax, args):
     rects = ax.bar(data.data[0],
                    data.data[1],
                    width,
-                   color=args.color_list[i],
+                   color=ColorPicker(i, args),
                    linewidth=0.0,
                    alpha=1.0)
     ax.xaxis.set_ticklabels([])
@@ -499,10 +576,10 @@ def PlotTicks(data_list, ax, args):
       ax.add_line(
         lines.Line2D(xdata=[d, d],
                      ydata=[y0, y1],
-                     color=args.color_list[i],
+                     color=ColorPicker(i, args),
                      marker=None,
                      markersize=args.markersize,
-                     markerfacecolor=args.color_list[i],
+                     markerfacecolor=ColorPicker(i, args),
                      markeredgecolor='None',
                      alpha=args.alpha,
                      linewidth=args.linewidth))
@@ -553,10 +630,10 @@ def PlotPoints(data_list, ax, args):
     ax.add_line(
       lines.Line2D(xdata=data.data[1],
                    ydata=data.data[0],
-                   color=args.color_list[i],
+                   color=ColorPicker(i, args),
                    marker='o',
                    markersize=args.markersize,
-                   markerfacecolor=args.color_list[i],
+                   markerfacecolor=ColorPicker(i, args),
                    markeredgecolor='None',
                    alpha=args.alpha,
                    linewidth=0.0))
@@ -600,8 +677,8 @@ def MakeProxyPlots(args):
   for i, afile in enumerate(args.files, 0):
     proxy_plots.append(
       plt.Rectangle(
-        (0, 0), 1, 1, fc=args.color_list[i % len(args.color_list)],
-        ec=args.color_list[i % len(args.color_list)]))
+        (0, 0), 1, 1, fc=ColorPicker(i, args),
+        ec=ColorPicker(i, args)))
   return proxy_plots
 
 
