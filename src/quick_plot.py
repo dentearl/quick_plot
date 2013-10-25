@@ -323,19 +323,15 @@ def ColorPicker(i, args):
     args: an argparse arguments object
 
   Returns:
-    color: a valid matplotlib color
+    color: a valid matplotlib color, or a list of colors if mode is hist
   """
   if args.mode in ('column', 'bar'):
     return args.colors_light[i % len(args.colors_light)]
   elif args.mode in ('hist'):
     # hist requires a list of colors be returned
-    if len(args.colors_light) < i:
-      return args.colors_light[0:i]
-    else:
-      colors = []
-      for i in xrange(0, i):
-        colors.append(args.colors_light[i % len(args.colors_light)])
-      return colors
+    colors = []
+    for i in xrange(0, i):
+      colors.append(args.colors_light[i % len(args.colors_light)])
   elif args.mode in ('line', 'scatter', 'tick', 'point', 'barcode'):
     return args.colors_medium[i % len(args.colors_medium)]
 
@@ -475,7 +471,7 @@ def PlotHistogram(data_list, ax, args):
   for data in data_list:
     datas.append(data.data[1])
   n, bins, patch_groups = ax.hist(
-    datas, color=ColorPicker(len(datas), args), histtype='bar')
+    datas, color=ColorPicker(len(data_list), args), histtype='bar')
   for pg in patch_groups:
     if isinstance(pg, matplotlib.container.BarContainer):
       # if there are multiple files, pg will be a BarContainer
@@ -673,12 +669,20 @@ def MakeProxyPlots(args):
   Returns:
     proxy_plots: A list of matplotlib plot objects.
   """
-  proxy_plots = []
-  for i, afile in enumerate(args.files, 0):
-    proxy_plots.append(
-      plt.Rectangle(
-        (0, 0), 1, 1, fc=ColorPicker(i, args),
-        ec=ColorPicker(i, args)))
+  if args.mode != 'hist':
+    proxy_plots = []
+    for i, afile in enumerate(args.files, 0):
+      proxy_plots.append(
+        plt.Rectangle(
+          (0, 0), 1, 1, fc=ColorPicker(i, args),
+          ec=ColorPicker(i, args)))
+  else:
+    proxy_plots = []
+    for i, afile in enumerate(args.files, 0):
+      proxy_plots.append(
+        plt.Rectangle(
+          (0, 0), 1, 1, fc=ColorPicker(len(args.files), args)[i],
+          ec=ColorPicker(len(args.files), args)[i]))
   return proxy_plots
 
 
