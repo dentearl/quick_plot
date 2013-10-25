@@ -278,11 +278,9 @@ def PlotTwoDimension(data_list, ax, args):
   else:
     marker = None
     alpha = 1.0
+  args.xmin = min(map(min, map(lambda data: data.data[0], data_list)))
+  args.xmax = max(map(max, map(lambda data: data.data[0], data_list)))
   for i, data in enumerate(data_list, 0):
-    if len(data.data[0]) != len(data.data[1]):
-      data.data[0] = range(1, len(data.data[1]) + 1)
-      args.xmin = 1
-      args.xmax=len(data.data[1])
     ax.add_line(
       lines.Line2D(xdata=data.data[0],
                    ydata=data.data[1],
@@ -420,11 +418,13 @@ def PlotColumns(data_list, ax, args):
     args: an argparse arguments object.
   """
   width = 2.0 / 3.0 / len(data_list)
+  data_min = min(map(numpy.min, map(lambda x: x.data[1], data_list)))
+  data_max = max(map(numpy.max, map(lambda x: x.data[1], data_list)))
+  args.xmin = 0
+  args.xmax = max(map(len, map(lambda data: data.data[1], data_list)))
   for i, data in enumerate(data_list, 0):
     data.data[0] = range(0, len(data.data[1]))
     data.data[0] = numpy.add(data.data[0], width * i)  # offset
-    args.xmin = 0
-    args.xmax = len(data.data[1])
     rects = ax.bar(data.data[0],
                    data.data[1],
                    width,
@@ -432,6 +432,12 @@ def PlotColumns(data_list, ax, args):
                    linewidth=0.0,
                    alpha=1.0)
     ax.xaxis.set_ticklabels([])
+  xmin, xmax, ymin, ymax = ax.axis()
+  ymin, ymax = HandleLimits(min(0.0, data_min), ymax,
+                            args.user_ymin, args.user_ymax)
+  args.ymin = ymin
+  args.ymax = ymax
+  ax.set_ylim([ymin, ymax])
 
 
 def GetTickYValues(i, args):
@@ -621,25 +627,26 @@ def CleanAxis(ax, args):
     ax: a matplotlib axis object
     args: an argparse argument object
   """
-  # logarithmic axes
+  # y axis
   if args.is_log_y:
     ax.set_yscale('log')
   else:
     arange = args.ymax - args.ymin
-    if args.mode not in ('hist', 'tick', 'barcode', 'point'):
+    if args.mode not in ('hist', 'tick', 'barcode', 'point', 'bar', 'column'):
       ymin, ymax = HandleLimits(args.ymin - arange * 0.05,
                                 args.ymax + arange * 0.05,
                                 args.user_ymin, args.user_ymax)
-      ax.set_ylim([args.ymin - arange * 0.05, args.ymax + arange * 0.05])
+      ax.set_ylim([ymin, ymax])
+  # x axis
   if args.is_log_x:
     ax.set_xscale('log')
   else:
     arange = args.xmax - args.xmin
-    if args.mode not in ('hist', 'tick', 'barcode', 'point'):
+    if args.mode not in ('hist', 'tick', 'barcode', 'point', 'bar', 'column'):
       xmin, xmax = HandleLimits(args.xmin - arange * 0.05,
                                 args.xmax + arange * 0.05,
                                 args.user_xmin, args.user_xmax)
-      ax.set_xlim([args.xmin - arange * 0.05, args.xmax + arange * 0.05])
+      ax.set_xlim([xmin, xmax])
   # labels
   if args.xlabel != 'sentinel_value':
     ax.set_xlabel(args.xlabel)
