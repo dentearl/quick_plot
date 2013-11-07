@@ -1,6 +1,6 @@
 SHELL:=/bin/bash -e
 export SHELLOPTS=pipefail
-image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10, img/example_$(i).png)
+image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11, img/example_$(i).png)
 
 .PHONY = clean images
 
@@ -51,7 +51,11 @@ img/example_09.png: example/data_1d_3.txt example/data_1d_4.txt example/data_1d_
 	mv $@.tmp.png $@
 
 img/example_10.png: example/data_2d_8.txt
-	bin/quick_plot $^  --mode scatter --out_format png --out $@.tmp --alpha 0.1
+	bin/quick_plot $^  --mode scatter --out_format png --out $@.tmp
+	mv $@.tmp.png $@
+
+img/example_11.png: example/data_2d_8.txt
+	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --alpha 0.1
 	mv $@.tmp.png $@
 
 clean:

@@ -112,8 +112,14 @@ The input file may contain comment lines (lines that start with #). Files may co
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_09.png)
 
-### Plotting 2D data as scatter plot with alpha transparency, two files.
+### Plotting 2D data as scatter plot, one file.
 
-    bin/quick_plot example/data_2d_8.txt --mode scatter --alpha 0.1 --out_format png --out img/example_10.png
+    bin/quick_plot example/data_2d_8.txt --mode scatter --out_format png --out img/example_10.png
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_10.png)
+
+### Plotting 2D data as scatter plot with alpha transparency, one file.
+
+    bin/quick_plot example/data_2d_8.txt --mode scatter --alpha 0.1 --out_format png --out img/example_11.png
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11.png)
