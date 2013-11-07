@@ -290,8 +290,8 @@ def EstablishAxes(fig, args):
   Raises:
     ValueError: If an unknown spine location is passed.
   """
-  args.axLeft = 0.095
-  args.axWidth = 0.84
+  args.axLeft = 0.11
+  args.axWidth = 0.83
   args.axBottom = 0.17
   args.axHeight = 0.76
   ax = fig.add_axes([args.axLeft, args.axBottom,
