@@ -60,54 +60,60 @@ The input file may contain comment lines (lines that start with #). Files may co
 ## Examples
 ### Plotting 2D scatter data, one file, no legend.
 
-    bin/quick_plot example/data_2d_1.txt --mode scatter --markersize 7.0 --out_format png --out img/example_1.png --title '2D scatter data from example/data_2d_1.txt' --xlabel 'The x-axis' --ylabel 'The y-axis' --no_legend
+    bin/quick_plot example/data_2d_1.txt --mode scatter --markersize 7.0 --out_format png --out img/example_01.png --title '2D scatter data from example/data_2d_1.txt' --xlabel 'The x-axis' --ylabel 'The y-axis' --no_legend
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_1.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_01.png)
 
 ### Plotting 2D scatter data, two files.
 
-    bin/quick_plot example/data_2d_1.txt example/data_2d_2.txt --mode scatter --markersize 7.0 --out_format png --out img/example_2.png
+    bin/quick_plot example/data_2d_1.txt example/data_2d_2.txt --mode scatter --markersize 7.0 --out_format png --out img/example_02.png
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_2.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_02.png)
 
 ### Plotting 2D line data, two files.
 
-    bin/quick_plot example/data_2d_3.txt example/data_2d_4.txt --mode line --out_format png --out img/example_3.png
+    bin/quick_plot example/data_2d_3.txt example/data_2d_4.txt --mode line --out_format png --out img/example_03.png
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_3.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_03.png)
 
 ### Plotting 2D line data, three files.
 
-    bin/quick_plot example/data_2d_5.txt example/data_2d_6.txt example/data_2d_7.txt --mode line --out_format png --out img/example_4.png
+    bin/quick_plot example/data_2d_5.txt example/data_2d_6.txt example/data_2d_7.txt --mode line --out_format png --out img/example_04.png
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_4.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_04.png)
 
 ### Plotting 1D data as bars, two files.
 
-    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode bar --out_format png --out img/example_5.png
+    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode bar --out_format png --out img/example_05.png
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_5.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_05.png)
 
 ### Plotting 1D data as tick marks, two files.
 
-    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode tick --out_format png --out img/example_6.png
+    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode tick --out_format png --out img/example_06.png
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_6.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_06.png)
 
 ### Plotting 1D data as point marks, two files.
 
-    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode point --out_format png --out img/example_7.png
+    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode point --out_format png --out img/example_07.png
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_7.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_07.png)
 
 ### Plotting 1D data as point clouds (using jitter), two files.
 
-    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode point --jitter --out_format png --out img/example_8.png
+    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode point --jitter --out_format png --out img/example_08.png
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_8.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_08.png)
 
 ### Plotting 1D data as histogram, three files.
 
-    bin/quick_plot example/data_1d_3.txt example/data_1d_4.txt example/data_1d_5.txt --mode hist --out_format png --out img/example_9.png
+    bin/quick_plot example/data_1d_3.txt example/data_1d_4.txt example/data_1d_5.txt --mode hist --out_format png --out img/example_09.png
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_9.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_09.png)
+
+### Plotting 2D data as scatter plot with alpha transparency, two files.
+
+    bin/quick_plot example/data_2d_8.txt example/data_2d_9.txt --mode scatter --alpha 0.1 --out_format png --out img/example_10.png
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_10.png)
