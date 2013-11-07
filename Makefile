@@ -31,7 +31,7 @@ img/example_04.png: example/data_2d_5.txt example/data_2d_6.txt example/data_2d_
 	mv $@.tmp.png $@
 
 img/example_05.png: example/data_1d_1.txt example/data_1d_2.txt
-	bin/quick_plot $^  --mode bar --out_format png --out $@.tmp
+	bin/quick_plot $^ --mode bar --out_format png --out $@.tmp
 	mv $@.tmp.png $@
 
 img/example_06.png: example/data_1d_1.txt example/data_1d_2.txt
@@ -47,15 +47,15 @@ img/example_08.png: example/data_1d_1.txt example/data_1d_2.txt
 	mv $@.tmp.png $@
 
 img/example_09.png: example/data_1d_3.txt example/data_1d_4.txt example/data_1d_5.txt
-	bin/quick_plot $^  --mode hist --out_format png --out $@.tmp
+	bin/quick_plot $^ --mode hist --out_format png --out $@.tmp
 	mv $@.tmp.png $@
 
 img/example_10.png: example/data_2d_8.txt
-	bin/quick_plot $^  --mode scatter --out_format png --out $@.tmp
+	bin/quick_plot $^ --mode scatter --markersize 5.0 --out_format png --out $@.tmp
 	mv $@.tmp.png $@
 
 img/example_11.png: example/data_2d_8.txt
-	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --alpha 0.1
+	bin/quick_plot $^ --mode scatter --markersize 5.0 --out_format png --out $@.tmp --alpha 0.1
 	mv $@.tmp.png $@
 
 clean:
