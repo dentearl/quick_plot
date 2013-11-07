@@ -240,6 +240,7 @@ def CheckArguments(args, parser):
                        ]
     CorrectColorTuples(args)
 
+
 def CorrectColorTuples(args):
   """Corrects the 0-255 values in colors_light and colors_medium to 0.0-1.0
 
