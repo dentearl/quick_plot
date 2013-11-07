@@ -114,6 +114,6 @@ The input file may contain comment lines (lines that start with #). Files may co
 
 ### Plotting 2D data as scatter plot with alpha transparency, two files.
 
-    bin/quick_plot example/data_2d_8.txt example/data_2d_9.txt --mode scatter --alpha 0.1 --out_format png --out img/example_10.png
+    bin/quick_plot example/data_2d_8.txt --mode scatter --alpha 0.1 --out_format png --out img/example_10.png
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_10.png)
