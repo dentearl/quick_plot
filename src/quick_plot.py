@@ -277,7 +277,6 @@ def DefineColors(args):
                         (  0,   0,   0),  # black
                         (199, 180,  46),  # d yellow
                        ]
-    CorrectColorTuples(args)
   elif args.colors == 'mono':
     args.colors_light = [(140, 140, 140),  # l grey
                         ]
@@ -285,7 +284,6 @@ def DefineColors(args):
                          ]
     args.colors_dark = [(  0,   0,   0),  # black
                        ]
-    CorrectColorTuples(args)
   elif args.colors == 'hcl_ggplot2':
     args.colors_light = [(158, 217, 255),  # l blue
                          (246, 209, 146),  # l mustard
@@ -314,6 +312,7 @@ def DefineColors(args):
                         (219,  95, 255),  # d purple
                         (255,  40, 201),  # d magenta
                        ]
+  if isinstance(args.colors_light[0].__class__, tuple):
     CorrectColorTuples(args)
 
 
