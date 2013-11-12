@@ -507,7 +507,6 @@ def PlotContour(data_list, ax, args):
              rightside_up=True)
   # for c in c_set.collections:
   #   c.set_linestyle('solid')
-  print 'ha'
 
 
 def PlotLineScatter(data_list, ax, args):
