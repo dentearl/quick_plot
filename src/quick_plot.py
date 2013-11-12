@@ -212,6 +212,15 @@ def CheckArguments(args, parser):
   args.ymin = sys.maxint
   if args.contour_bin < 3:
     parser.error('--contour_bin must be greater than 3.')
+  DefineColors(args)
+
+
+def DefineColors(args):
+  """Based on --colors, define the set of colors to use in the plot.
+
+  Args:
+    args: an argparse arguments object
+  """
   # TODO: allow for a way to override the color list
   if args.colors == 'bostock':
     args.colors_light = ['#aec7e8',  # l blue
