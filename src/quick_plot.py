@@ -79,8 +79,12 @@ def InitArguments(parser):
                             'density) default=%(default)s'))
   parser.add_argument('--colors', dest='colors', default='brewer', type=str,
                       help=('color palatte mode. may be in (bostock, brewer, '
-                            'mono) '
+                            'mono, hcl_ggplot2) '
                             'default=%(default)s'))
+  parser.add_argument('--color_index_offset', dest='color_index_offset',
+                      type=int, default=0,
+                      help=('index offset value to shift the starting point '
+                            'of the selected color map. default=%(default)s'))
   parser.add_argument('--alpha', default=1.0, type=float,
                       help='alpha value for markers in --mode scatter')
   parser.add_argument('--dot_size', '--markersize', dest='markersize',
@@ -273,6 +277,35 @@ def CheckArguments(args, parser):
     args.colors_dark = [(  0,   0,   0),  # black
                        ]
     CorrectColorTuples(args)
+  elif args.colors == 'hcl_ggplot2':
+    args.colors_light = [(158, 217, 255),  # l blue
+                         (246, 209, 146),  # l mustard
+                         ( 93, 237, 189),  # l green
+                         (255, 189, 187),  # l pink
+                         (182, 228, 149),  # l olive
+                         ( 51, 235, 236),  # l teal
+                         (241, 194, 255),  # l purple
+                         (255, 179, 234),  # l magenta
+                        ]
+    args.colors_medium = [( 98, 162, 209),  # m blue
+                          (190, 154,  87),  # m mustard
+                          (223, 133, 131),  # m pink
+                          (  0, 183, 134),  # m green
+                          (126, 173,  90),  # m olive
+                          (  0, 180, 181),  # m teal
+                          (187, 134, 209),  # m purple
+                          (225, 122, 179),  # m magenta
+                         ]
+    args.colors_dark = [(  0, 163, 255),  # d blue
+                        (213, 151,   0),  # d mustard
+                        (  0, 201, 106),  # d green
+                        (254, 102,  97),  # d pink
+                        ( 98, 183,   0),  # d olive
+                        (  1, 196, 200),  # d teal
+                        (219,  95, 255),  # d purple
+                        (255,  40, 201),  # d magenta
+                       ]
+    CorrectColorTuples(args)
 
 
 def CorrectColorTuples(args):
@@ -379,6 +412,7 @@ def ColorPicker(i, args):
            or a name of a valid matplotlib colormap or a matplotlib color map
            if the mode is contour
   """
+  i += args.color_index_offset
   if args.mode in ('column', 'bar'):
     return args.colors_light[i % len(args.colors_light)]
   elif args.mode in ('hist'):

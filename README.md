@@ -32,8 +32,8 @@ The input file may contain comment lines (lines that start with #). Files may co
                             needed. default=my_plot
       --mode MODE           plotting mode. may be in (line, scatter, column, bar, hist,
                             tick, barcode, point, contour, density) default=line
-      --colors COLORS       color palatte mode. may be in (bostock, brewer, mono)
-                            default=brewer
+      --colors COLORS       color palatte mode. may be in (bostock, brewer, mono,
+                            hcl_ggplot2) default=brewer
       --alpha ALPHA         alpha value for markers in --mode scatter
       --dot_size MARKERSIZE, --markersize MARKERSIZE
                             value for markers in --mode scatter
