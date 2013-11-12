@@ -123,3 +123,27 @@ The input file may contain comment lines (lines that start with #). Files may co
     bin/quick_plot example/data_2d_8.txt --mode scatter --markersize 5.0 --alpha 0.1 --out_format png --out img/example_11.png
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11.png)
+
+### Plotting 1D data as density curve, one file.
+
+    bin/quick_plot example/data_1d_7.txt --mode density --out_format png --out img/example_12.png --title 'data_2d_8.txt x marginal'
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_12.png)
+
+### Plotting 1D data as density curve, one file.
+
+    bin/quick_plot example/data_1d_8.txt --mode density --out_format png --out img/example_13.png --title 'data_2d_8.txt y marginal'
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_13.png)
+
+### Plotting 2D data as contour plot, one file.
+
+    bin/quick_plot example/data_2d_8.txt --mode contour --out_format png --out img/example_14.png --title 'A hard example for a contour plot'
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_14.png)
+
+### Plotting 2D data as contour plot, one file.
+
+    bin/quick_plot example/data_2d_9.txt --mode contour --out_format png --out img/example_15.png --title 'An easier example for a contour plot'
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_15.png)

@@ -46,7 +46,7 @@ import numpy
 ##############################
 from argparse import ArgumentParser
 import os
-from scipy.stats import scoreatpercentile, linregress
+from scipy.stats import scoreatpercentile, linregress, gaussian_kde
 import sys
 
 
@@ -75,8 +75,8 @@ def InitArguments(parser):
                             'extension needed. default=%(default)s'))
   parser.add_argument('--mode', dest='mode', default='line', type=str,
                       help=('plotting mode. may be in (line, scatter, '
-                            'column, bar, hist, tick, barcode, point) '
-                            'default=%(default)s'))
+                            'column, bar, hist, tick, barcode, point, contour, '
+                            'density) default=%(default)s'))
   parser.add_argument('--colors', dest='colors', default='brewer', type=str,
                       help=('color palatte mode. may be in (bostock, brewer, '
                             'mono) '
@@ -139,6 +139,33 @@ def InitArguments(parser):
   parser.add_argument('--jitter', dest='jitter', default=False,
                       action='store_true',
                       help='turn on jitter for certain plotting modes')
+  parser.add_argument('--aspect_equal', dest='aspect_equal', default=False,
+                      action='store_true',
+                      help='Turn on equal aspect ratio for the plot')
+  contour = parser.add_argument_group('contour')
+  contour.add_argument('--contour_bin', dest='contour_bin', default=10,
+                       type=int,
+                       help=('Bin size of the contour plot. Smaller integers '
+                             'lead to smoother curves.'))
+  contour.add_argument('--contour_logspace', dest='contour_logspace',
+                       default=False, action='store_true',
+                       help=('Switch the contour lines from linear spacing '
+                             'to log spacing'))
+  contour.add_argument('--contour_num_levels', dest='contour_num_levels',
+                       default=6, type=int,
+                       help=('The number of levels in the contour plot, '
+                             'default=%(default)s'))
+  density = parser.add_argument_group('density')
+  density.add_argument('--density_covariance', dest='density_covariance',
+                       type=float,
+                       help=('Gaussian kernel density estimate covariance, '
+                             'raising the value leads to smoother curves. '
+                             'This roughly corresponds to bandwidth in R. '
+                             'Default is to discover the value automatically.'))
+  density.add_argument('--density_num_bins', dest='density_num_bins', type=int,
+                       default=200,
+                       help=('Number of "bins" for the density curve. '
+                             'default=%(default)s'))
 
 
 def CheckArguments(args, parser):
@@ -148,6 +175,8 @@ def CheckArguments(args, parser):
     args: an argparse arguments object
     parser: an argparse parser object
   """
+  args.recognized_modes = ['line', 'scatter', 'bar', 'column', 'hist',
+                           'tick', 'barcode', 'point', 'contour', 'density']
   if len(args.files) > 0:
     for f in args.files:
       if not os.path.exists(f):
@@ -160,10 +189,13 @@ def CheckArguments(args, parser):
   if args.out_format not in ('pdf', 'png', 'eps', 'all'):
     parser.error('Unrecognized --out_format %s. Choose one from: '
                  'pdf png eps all.' % args.out_format)
-  if args.mode not in ('line', 'scatter', 'bar', 'column', 'hist',
-                       'tick', 'barcode', 'point'):
-    parser.error('Unrecognized --mode %s. Choose one from: '
-                 'line scatter bar column hist tick barcode point.' % args.mode)
+  if args.mode not in args.recognized_modes:
+    parser.error('Unrecognized --mode %s. Choose one from: %s'
+                 % (args.mode, str(args.recognized_mode)))
+  if args.mode == 'contour':
+    if len(args.files) > 1:
+      parser.error('--mode=contour does not permit more than one file '
+                   'to be plotted at a time.')
   if args.colors not in ('bostock', 'brewer', 'mono'):
     parser.error('Unrecognized --colors %s palette. Choose one from: '
                  'bostock brewer mono.' % args.colors)
@@ -174,6 +206,8 @@ def CheckArguments(args, parser):
   args.xmin = sys.maxint
   args.ymax = -sys.maxint
   args.ymin = sys.maxint
+  if args.contour_bin < 3:
+    parser.error('--contour_bin must be greater than 3.')
   # TODO: allow for a way to override the color list
   if args.colors == 'bostock':
     args.colors_light = ['#aec7e8',  # l blue
@@ -342,6 +376,8 @@ def ColorPicker(i, args):
 
   Returns:
     color: a valid matplotlib color, or a list of colors if mode is hist
+           or a name of a valid matplotlib colormap or a matplotlib color map
+           if the mode is contour
   """
   if args.mode in ('column', 'bar'):
     return args.colors_light[i % len(args.colors_light)]
@@ -351,12 +387,89 @@ def ColorPicker(i, args):
     for i in xrange(0, i):
       colors.append(args.colors_light[i % len(args.colors_light)])
     return colors
-  elif args.mode in ('line', 'scatter', 'tick', 'point', 'barcode'):
+  elif args.mode in ('contour'):
+    colors = 'k'
+    return colors
+  elif args.mode in ('line', 'scatter', 'tick', 'point', 'barcode', 'density'):
     return args.colors_medium[i % len(args.colors_medium)]
+
+
+def PlotDensity(data_list, ax, args):
+  """Plot one dimensional data as density curves.
+
+  Args:
+    data_list: a list of Data objects
+    ax: a matplotlib axis object
+    args: an argparse arguments object
+  """
+  # first create density list, then pass that to PlotLineScatter
+  density_list = []
+  for data in data_list:
+    d = Data()
+    d.label = data.label
+    density = gaussian_kde(data.data[1])
+    x_data = numpy.linspace(numpy.min(data.data[1]),
+                            numpy.max(data.data[1]),
+                            args.density_num_bins)
+    if args.density_covariance is not None:
+      density.covariance_factor = lambda : args.density_covariance
+      density._compute_covariance()  # bad mojo calling privates like this
+    d.data = numpy.array([x_data, density(x_data)])
+    density_list.append(d)
+  PlotLineScatter(density_list, ax, args)
 
 
 def PlotTwoDimension(data_list, ax, args):
   """Plot two dimensional data.
+
+  Args:
+    data_list: a list of Data objects
+    ax: a matplotlib axis object
+    args: an argparse arguments object
+  """
+  if args.mode in ('scatter', 'line'):
+    PlotLineScatter(data_list, ax, args)
+  elif args.mode == 'contour':
+    PlotContour(data_list, ax, args)
+  elif args.mode == 'density':
+    PlotDensity(data_list, ax, args)
+
+
+def PlotContour(data_list, ax, args):
+  """Plot two dimensional density contour.
+
+  Args:
+    data_list: a list of Data objects
+    ax: a matplotlib axis object
+    args: an argparse arguments object
+  """
+  data = data_list[0]
+  x = data.data[0]
+  y = data.data[1]
+  H, xedges, yedges = numpy.histogram2d(
+    x, y, range=[[min(x), max(x)], [min(y), max(y)]], bins=(args.contour_bin,
+                                                            args.contour_bin))
+  extent = [yedges[0], yedges[-1], xedges[0], xedges[-1]]
+  c_max = max(map(max, H))
+  c_min = min(map(min, H))
+  nc_levels = args.contour_num_levels
+  if args.contour_logspace:
+    c_levels = numpy.logspace(c_min, c_max, nc_levels)
+  else:
+    c_levels = numpy.linspace(c_min, c_max, nc_levels)
+  im = plt.imshow(H, interpolation='bilinear', origin='lower',
+                  cmap=matplotlib.cm.binary, extent=extent)
+  c_set = plt.contour(H, extent=extent, origin='lower',
+                      levels=c_levels, colors=ColorPicker(0, args))
+  plt.clabel(c_set, colors='red', inline=True, fmt='%1.0i',
+             rightside_up=True)
+  # for c in c_set.collections:
+  #   c.set_linestyle('solid')
+  print 'ha'
+
+
+def PlotLineScatter(data_list, ax, args):
+  """Plot two dimensional line or scatter data.
 
   Args:
     data_list: a list of Data objects
@@ -372,6 +485,8 @@ def PlotTwoDimension(data_list, ax, args):
     alpha = 1.0
   args.xmin = min(map(min, map(lambda data: data.data[0], data_list)))
   args.xmax = max(map(max, map(lambda data: data.data[0], data_list)))
+  args.ymin = min(map(min, map(lambda data: data.data[1], data_list)))
+  args.ymax = max(map(max, map(lambda data: data.data[1], data_list)))
   for i, data in enumerate(data_list, 0):
     ax.add_line(
       lines.Line2D(xdata=data.data[0],
@@ -670,7 +785,7 @@ def PlotData(data_list, ax, args):
     ax: a matplotlib axis object.
     args: an argparse argument object.
   """
-  if args.mode in ('scatter', 'line'):
+  if args.mode in ('scatter', 'line', 'contour', 'density'):
     PlotTwoDimension(data_list, ax, args)
   elif args.mode in ('bar', 'column', 'hist', 'tick', 'barcode', 'point'):
     PlotOneDimension(data_list, ax, args)
@@ -733,8 +848,8 @@ def CleanAxis(ax, args):
   if args.is_log_y:
     ax.set_yscale('log')
   else:
-    arange = args.ymax - args.ymin
     if args.mode not in ('hist', 'tick', 'barcode', 'point', 'bar', 'column'):
+      arange = args.ymax - args.ymin
       ymin, ymax = HandleLimits(args.ymin - arange * 0.05,
                                 args.ymax + arange * 0.05,
                                 args.user_ymin, args.user_ymax)
@@ -743,8 +858,8 @@ def CleanAxis(ax, args):
   if args.is_log_x:
     ax.set_xscale('log')
   else:
-    arange = args.xmax - args.xmin
     if args.mode not in ('hist', 'tick', 'barcode', 'point', 'bar', 'column'):
+      arange = args.xmax - args.xmin
       xmin, xmax = HandleLimits(args.xmin - arange * 0.05,
                                 args.xmax + arange * 0.05,
                                 args.user_xmin, args.user_xmax)
@@ -763,10 +878,14 @@ def CleanAxis(ax, args):
     ax.set_title(args.title)
   # legend
   if args.is_legend:
-    proxy_plots = MakeProxyPlots(args)
-    legend_labels = MakeLegendLabels(args)
-    leg = plt.legend(proxy_plots, legend_labels, 'upper right', numpoints=1)
-    leg._drawFrame = False
+    if args.mode not in ('contour'):
+      proxy_plots = MakeProxyPlots(args)
+      legend_labels = MakeLegendLabels(args)
+      leg = plt.legend(proxy_plots, legend_labels, 'upper right', numpoints=1)
+      leg._drawFrame = False
+  # aspect ratio
+  if args.aspect_equal:
+    ax.axis('equal')
 
 
 def main():
