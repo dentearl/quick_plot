@@ -149,7 +149,7 @@ The input file may contain comment lines (lines that start with #). Files may co
 
     bin/quick_plot example/data_2d_8.txt --mode scatter --markersize 5.0 --alpha 0.1 --out_format png --out img/example_11_a.png --aspect_equal
 
-![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11.png)
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11_a.png)
 
 ### Plotting 1D data as density curve, one file.
 
