@@ -312,7 +312,7 @@ def DefineColors(args):
                         (219,  95, 255),  # d purple
                         (255,  40, 201),  # d magenta
                        ]
-  if isinstance(args.colors_light[0].__class__, tuple):
+  if isinstance(args.colors_light[0], tuple):
     CorrectColorTuples(args)
 
 
