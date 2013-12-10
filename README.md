@@ -37,6 +37,7 @@ The input file may contain comment lines (lines that start with #). Files may co
       --alpha ALPHA         alpha value for markers in --mode scatter
       --dot_size MARKERSIZE, --markersize MARKERSIZE
                             value for markers in --mode scatter
+      --marker MARKER       Marker to use.
       --linewidth LINEWIDTH
                             Line width for the plot. default=2.0
       --logy                Put the y-axis into log. default=False

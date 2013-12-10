@@ -90,6 +90,8 @@ def InitArguments(parser):
   parser.add_argument('--dot_size', '--markersize', dest='markersize',
                       default=2.0, type=float,
                       help='value for markers in --mode scatter')
+  parser.add_argument('--marker', dest='marker', default=None, type=str,
+                      help='Marker to use.')
   parser.add_argument('--linewidth', dest='linewidth', default=2.0,
                       type=float,
                       help='Line width for the plot. default=%(default)s')
@@ -146,8 +148,6 @@ def InitArguments(parser):
   parser.add_argument('--aspect_equal', dest='aspect_equal', default=False,
                       action='store_true',
                       help='Turn on equal aspect ratio for the plot')
-  parser.add_argument('--marker', dest='marker', default=None, type=str,
-                      help='Marker to use.')
   contour = parser.add_argument_group('contour')
   contour.add_argument('--contour_bin', dest='contour_bin', default=10,
                        type=int,
