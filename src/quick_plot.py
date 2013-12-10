@@ -146,6 +146,8 @@ def InitArguments(parser):
   parser.add_argument('--aspect_equal', dest='aspect_equal', default=False,
                       action='store_true',
                       help='Turn on equal aspect ratio for the plot')
+  parser.add_argument('--marker', dest='marker', default=None, type=str,
+                      help='Marker to use.')
   contour = parser.add_argument_group('contour')
   contour.add_argument('--contour_bin', dest='contour_bin', default=10,
                        type=int,
@@ -518,11 +520,14 @@ def PlotLineScatter(data_list, ax, args):
     args: an argparse arguments object
   """
   if args.mode == 'scatter':
-    marker = 'o'
     args.linewidth = 0.0
     alpha = args.alpha
+    if args.marker is None:
+      marker = 'o'
+    else:
+      marker = args.marker
   else:
-    marker = None
+    marker = args.marker
     alpha = 1.0
   args.xmin = min(map(min, map(lambda data: data.data[0], data_list)))
   args.xmax = max(map(max, map(lambda data: data.data[0], data_list)))
