@@ -561,10 +561,10 @@ def PlotLineScatter(data_list, ax, args):
                      ydata=[fitline[0], fitline[-1]],
                      color='red',
                      linestyle='--'))
-      slope, intercept, r, p, stderr = linregress(rxlist, rylist)
+      slope, intercept, r_value, p_value, stderr = linregress(rxlist, rylist)
       ax.text(x=(rxlist[0] + rxlist[-1]) / 2.0,
               y=(fitline[0] + fitline[-1]) / 2.0,
-              s=r'%f * x + %f, $r^2$=%f' % (w[0], w[1], r * r))
+              s=r'%f * x + %f, $r^2$=%f' % (w[0], w[1], r_value * r_value))
 
 
 def ReadFiles(args):
