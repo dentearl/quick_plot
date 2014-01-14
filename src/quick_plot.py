@@ -562,7 +562,6 @@ def PlotLineScatter(data_list, ax, args):
                      color='red',
                      linestyle='--'))
       slope, intercept, r_value, p_value, stderr = linregress(rxlist, rylist)
-      print rxlist, rylist, slope, intercept, r_value, p_value, stderr
       ax.text(x=(rxlist[0] + rxlist[-1]) / 2.0,
               y=(fitline[0] + fitline[-1]) / 2.0,
               s='%f * x + %f,\n$r^2$=%f, $p$=%f' % (w[0], w[1], r_value * r_value, p_value))
