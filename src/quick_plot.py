@@ -545,8 +545,8 @@ def PlotLineScatter(data_list, ax, args):
                    alpha=alpha,
                    linewidth=args.linewidth))
     if args.regression:
-      data.data[0].sort()
-      data.data[1].sort()
+      # used for plotting the fit line
+      data.data[0], data.data[1] = zip(*sorted(zip(data.data[0], data.data[1])))
       rxlist = numpy.array(data.data[0])
       rylist = numpy.array(data.data[1])
       A = numpy.array([rxlist, numpy.ones(len(rxlist))])
@@ -562,9 +562,10 @@ def PlotLineScatter(data_list, ax, args):
                      color='red',
                      linestyle='--'))
       slope, intercept, r_value, p_value, stderr = linregress(rxlist, rylist)
+      print rxlist, rylist, slope, intercept, r_value, p_value, stderr
       ax.text(x=(rxlist[0] + rxlist[-1]) / 2.0,
               y=(fitline[0] + fitline[-1]) / 2.0,
-              s=r'%f * x + %f, $r^2$=%f' % (w[0], w[1], r_value * r_value))
+              s='%f * x + %f,\n$r^2$=%f, $p$=%f' % (w[0], w[1], r_value * r_value, p_value))
 
 
 def ReadFiles(args):
