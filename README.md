@@ -190,6 +190,6 @@ The input file may contain comment lines (lines that start with #). Files may co
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_18.png)
 
-    bin/quick_plot example/anscombe_iv.txt --mode scatter --out_format png --out img/example_19.png --title 'Anscombe_iiv --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+    bin/quick_plot example/anscombe_iv.txt --mode scatter --out_format png --out img/example_19.png --title 'Anscombe_iiv' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_19.png)
