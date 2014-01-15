@@ -1,6 +1,6 @@
 SHELL:=/bin/bash -e
 export SHELLOPTS=pipefail
-image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 13 14 15, img/example_$(i).png)
+image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 13 14 15 16 17 18 19, img/example_$(i).png)
 
 .PHONY = clean images
 
@@ -76,6 +76,22 @@ img/example_14.png: example/data_2d_8.txt
 
 img/example_15.png: example/data_2d_9.txt
 	bin/quick_plot $^ --mode contour --out_format png --out $@.tmp --title 'An easier example for a contour plot'
+	mv $@.tmp.png $@
+
+img/example_16.png: example/anscombe_i.txt
+	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_i' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+	mv $@.tmp.png $@
+
+img/example_17.png: example/anscombe_ii.txt
+	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_ii' --regression --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+	mv $@.tmp.png $@
+
+img/example_18.png: example/anscombe_iii.txt
+	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_iii' --regression --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+	mv $@.tmp.png $@
+
+img/example_19.png: example/anscombe_iv.txt
+	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_iv' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
 	mv $@.tmp.png $@
 
 clean:

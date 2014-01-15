@@ -545,8 +545,6 @@ def PlotLineScatter(data_list, ax, args):
                    alpha=alpha,
                    linewidth=args.linewidth))
     if args.regression:
-      # used for plotting the fit line
-      data.data[0], data.data[1] = zip(*sorted(zip(data.data[0], data.data[1])))
       rxlist = numpy.array(data.data[0])
       rylist = numpy.array(data.data[1])
       A = numpy.array([rxlist, numpy.ones(len(rxlist))])
@@ -555,9 +553,11 @@ def PlotLineScatter(data_list, ax, args):
       except ValueError:
         sys.stderr.write('Warning, unable to perform regression!')
         return
-      fitline = (w[0] * rxlist) + w[1]
+
+      sorted_rxlist = numpy.array(sorted(rxlist))
+      fitline = w[0] * sorted_rxlist + w[1]
       ax.add_line(
-        lines.Line2D(xdata=[rxlist[0], rxlist[-1]],
+        lines.Line2D(xdata=[numpy.min(rxlist), numpy.max(rxlist)],
                      ydata=[fitline[0], fitline[-1]],
                      color='red',
                      linestyle='--'))

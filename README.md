@@ -175,3 +175,21 @@ The input file may contain comment lines (lines that start with #). Files may co
     bin/quick_plot example/data_2d_9.txt --mode contour --out_format png --out img/example_15.png --title 'An easier example for a contour plot'
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_15.png)
+
+### Anscombe's quartet
+
+    bin/quick_plot example/anscombe_i.txt --mode scatter --out_format png --out img/example_16.png --title 'Anscombe_i' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_16.png)
+
+    bin/quick_plot example/anscombe_ii.txt --mode scatter --out_format png --out img/example_17.png --title 'Anscombe_ii' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_17.png)
+
+    bin/quick_plot example/anscombe_iii.txt --mode scatter --out_format png --out img/example_18.png --title 'Anscombe_iii' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_18.png)
+
+    bin/quick_plot example/anscombe_iv.txt --mode scatter --out_format png --out img/example_19.png --title 'Anscombe_iiv --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_19.png)
