@@ -58,7 +58,9 @@ class Data(object):
   """Class data holds data for plotting
   """
   def __init__(self):
-    self.data = None  # this will be an n by 2 numpy array.
+    self.data = None  # this will be a list of lists.
+    self.x = None  # this will be a numpy array
+    self.y = None
     self.label = ''
 
 
@@ -77,6 +79,10 @@ def InitArguments(parser):
                       help=('plotting mode. may be in (line, scatter, '
                             'column, bar, hist, tick, barcode, point, contour, '
                             'density) default=%(default)s'))
+  parser.add_argument('--columns', dest='columns', default='1,2', type=str,
+                      help=('two numbers, comma separated, can be reverse '
+                            'order, indicates x,y for plotting. '
+                            'default=$(default)s'))
   parser.add_argument('--colors', dest='colors', default='brewer', type=str,
                       help=('color palatte mode. may be in (bostock, brewer, '
                             'mono, hcl_ggplot2) '
@@ -215,6 +221,23 @@ def CheckArguments(args, parser):
   if args.contour_bin < 3:
     parser.error('--contour_bin must be greater than 3.')
   DefineColors(args)
+  columns = args.columns.split(',')
+  if len(columns) > 2:
+    parser.error('Too many --columns specified, can only take 2.')
+  if len(coulmns) < 1:
+    parser.error('Too few --columns specified, needs at least 1.')
+  for i in xrange(0, len(columns)):
+    try:
+      x = int(columns[i])
+    except ValueError:
+      parser.error('--columns input must be an integer')
+    if x < 1:
+      parser.error('--columns input must be a positive non-zero integer')
+    columns[i] = x
+  if len(columns) == 2:
+    args.columns = columns[0], columns[1]
+  else:
+    args.columns = columns[0]
 
 
 def DefineColors(args):
@@ -451,9 +474,9 @@ def PlotDensity(data_list, ax, args):
   for data in data_list:
     d = Data()
     d.label = data.label
-    density = gaussian_kde(data.data[1])
-    x_data = numpy.linspace(numpy.min(data.data[1]),
-                            numpy.max(data.data[1]),
+    density = gaussian_kde(data.y)
+    x_data = numpy.linspace(numpy.min(data.y),
+                            numpy.max(data.y),
                             args.density_num_bins)
     if args.density_covariance is not None:
       density.covariance_factor = lambda : args.density_covariance
@@ -488,8 +511,8 @@ def PlotContour(data_list, ax, args):
     args: an argparse arguments object
   """
   data = data_list[0]
-  x = data.data[0]
-  y = data.data[1]
+  x = data.x
+  y = data.y
   H, xedges, yedges = numpy.histogram2d(
     x, y, range=[[min(x), max(x)], [min(y), max(y)]], bins=(args.contour_bin,
                                                             args.contour_bin))
@@ -529,14 +552,14 @@ def PlotLineScatter(data_list, ax, args):
   else:
     marker = args.marker
     alpha = 1.0
-  args.xmin = min(map(min, map(lambda data: data.data[0], data_list)))
-  args.xmax = max(map(max, map(lambda data: data.data[0], data_list)))
-  args.ymin = min(map(min, map(lambda data: data.data[1], data_list)))
-  args.ymax = max(map(max, map(lambda data: data.data[1], data_list)))
+  args.xmin = min(map(min, map(lambda data: data.x, data_list)))
+  args.xmax = max(map(max, map(lambda data: data.x, data_list)))
+  args.ymin = min(map(min, map(lambda data: data.y, data_list)))
+  args.ymax = max(map(max, map(lambda data: data.y, data_list)))
   for i, data in enumerate(data_list, 0):
     ax.add_line(
-      lines.Line2D(xdata=data.data[0],
-                   ydata=data.data[1],
+      lines.Line2D(xdata=data.x,
+                   ydata=data.y,
                    color=ColorPicker(i, args),
                    marker=marker,
                    markersize=args.markersize,
@@ -545,8 +568,8 @@ def PlotLineScatter(data_list, ax, args):
                    alpha=alpha,
                    linewidth=args.linewidth))
     if args.regression:
-      rxlist = numpy.array(data.data[0])
-      rylist = numpy.array(data.data[1])
+      rxlist = numpy.array(data.x)
+      rylist = numpy.array(data.y)
       A = numpy.array([rxlist, numpy.ones(len(rxlist))])
       try:
         w = numpy.linalg.lstsq(A.T, rylist)[0]
@@ -650,7 +673,7 @@ def PlotHistogram(data_list, ax, args):
   width = 2.0 / 3.0 / len(data_list)
   datas = []
   for data in data_list:
-    datas.append(data.data[1])
+    datas.append(data.y)
   n, bins, patch_groups = ax.hist(
     datas, color=ColorPicker(len(data_list), args), histtype='bar')
   for pg in patch_groups:
@@ -672,15 +695,15 @@ def PlotColumns(data_list, ax, args):
     args: an argparse arguments object.
   """
   width = 2.0 / 3.0 / len(data_list)
-  data_min = min(map(numpy.min, map(lambda x: x.data[1], data_list)))
-  data_max = max(map(numpy.max, map(lambda x: x.data[1], data_list)))
+  data_min = min(map(numpy.min, map(lambda x: x.y, data_list)))
+  data_max = max(map(numpy.max, map(lambda x: x.y, data_list)))
   args.xmin = 0
-  args.xmax = max(map(len, map(lambda data: data.data[1], data_list)))
+  args.xmax = max(map(len, map(lambda data: data.y, data_list)))
   for i, data in enumerate(data_list, 0):
-    data.data[0] = range(0, len(data.data[1]))
-    data.data[0] = numpy.add(data.data[0], width * i)  # offset
-    rects = ax.bar(data.data[0],
-                   data.data[1],
+    data.x = range(0, len(data.y))
+    data.x = numpy.add(data.x, width * i)  # offset
+    rects = ax.bar(data.x,
+                   data.y,
                    width,
                    color=ColorPicker(i, args),
                    linewidth=0.0,
@@ -740,15 +763,15 @@ def PlotTicks(data_list, ax, args):
     ax: a matplotlib axis object
     args: an argparse arguments object
   """
-  data_min = min(map(numpy.min, map(lambda x: x.data[1], data_list)))
-  data_max = max(map(numpy.max, map(lambda x: x.data[1], data_list)))
+  data_min = min(map(numpy.min, map(lambda x: x.y, data_list)))
+  data_max = max(map(numpy.max, map(lambda x: x.y, data_list)))
   data_range = data_max - data_min
   if data_range == 0.0:
     data_min, data_max, data_range = -0.5, 0.5, 1.0
   data_min -= data_range * 0.1
   data_max += data_range * 0.1
   for i, data in enumerate(data_list, 0):
-    for d in data.data[1]:
+    for d in data.y:
       y0, y1 = GetTickYValues(i, args)
       ax.add_line(
         lines.Line2D(xdata=[d, d],
@@ -795,18 +818,18 @@ def PlotPoints(data_list, ax, args):
     ax: a matplotlib axis object
     args: an argparse arguments object
   """
-  data_min = min(map(numpy.min, map(lambda x: x.data[1], data_list)))
-  data_max = max(map(numpy.max, map(lambda x: x.data[1], data_list)))
+  data_min = min(map(numpy.min, map(lambda x: x.y, data_list)))
+  data_max = max(map(numpy.max, map(lambda x: x.y, data_list)))
   data_range = data_max - data_min
   if data_range == 0.0:
     data_min, data_max, data_range = -0.5, 0.5, 1.0
   data_min -= data_range * 0.1
   data_max += data_range * 0.1
   for i, data in enumerate(data_list, 0):
-    data.data[0] = GetPointYValues(len(data.data[1]), i, args)
+    data.x = GetPointYValues(len(data.y), i, args)
     ax.add_line(
-      lines.Line2D(xdata=data.data[1],
-                   ydata=data.data[0],
+      lines.Line2D(xdata=data.y,
+                   ydata=data.x,
                    color=ColorPicker(i, args),
                    marker='o',
                    markersize=args.markersize,
