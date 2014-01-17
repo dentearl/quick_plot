@@ -210,6 +210,9 @@ def InitArguments(parser):
   parser.add_argument('--jitter', dest='jitter', default=False,
                       action='store_true',
                       help='turn on jitter for certain plotting modes')
+  parser.add_argument('--random_seed', dest='random_seed', default=None,
+                      type=int,
+                      help='Random seed for use with --jitter flag.')
   parser.add_argument('--aspect_equal', dest='aspect_equal', default=False,
                       action='store_true',
                       help='Turn on equal aspect ratio for the plot')
@@ -281,6 +284,8 @@ def CheckArguments(args, parser):
     parser.error('--contour_bin must be greater than 3.')
   DefineColors(args)
   DefineColumns(args)
+  if args.random_seed is not None and args.jitter:
+    numpy.random.seed(seed=args.random_seed)
 
 
 def DefineColumns(args):

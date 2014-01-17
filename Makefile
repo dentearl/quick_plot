@@ -51,7 +51,7 @@ img/example_07.png: example/data_1d_1.txt example/data_1d_2.txt
 
 img/example_08.png: example/data_1d_1.txt example/data_1d_2.txt
 	mkdir -p $(dir $@)
-	bin/quick_plot $^ --mode point --jitter --out_format png --out $@.tmp
+	bin/quick_plot $^ --mode point --jitter --out_format png --out $@.tmp --random_seed=127
 	mv $@.tmp.png $@
 
 img/example_09.png: example/data_1d_3.txt example/data_1d_4.txt example/data_1d_5.txt

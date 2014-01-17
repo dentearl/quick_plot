@@ -125,8 +125,9 @@ The input file may contain comment lines (lines that start with #). Files may co
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_07.png)
 
 ### Plotting 1D data as point clouds (using jitter), two files.
+(Remove the <code>--random_seed</code> for production use).
 
-    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode point --jitter --out_format png --out img/example_08.png
+    bin/quick_plot example/data_1d_1.txt example/data_1d_2.txt --mode point --jitter --out_format png --out img/example_08.png --random_seed=127
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_08.png)
 
