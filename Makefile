@@ -1,6 +1,6 @@
 SHELL:=/bin/bash -e
 export SHELLOPTS=pipefail
-image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 13 14 15 16 17 18 19, img/example_$(i).png)
+image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 12_a 13 13_a 14 15 16 17 18 19, img/example_$(i).png)
 
 .PHONY = clean images
 
@@ -79,9 +79,19 @@ img/example_12.png: example/data_1d_7.txt
 	bin/quick_plot $^ --mode density --out_format png --out $@.tmp --title 'data_2d_8.txt x marginal'
 	mv $@.tmp.png $@
 
+img/example_12_a.png: example/data_2d_8.txt
+	mkdir -p $(dir $@)
+	bin/quick_plot $^ --mode density --out_format png --out $@.tmp --title 'data_2d_8.txt x marginal' --columns 1
+	mv $@.tmp.png $@
+
 img/example_13.png: example/data_1d_8.txt
 	mkdir -p $(dir $@)
 	bin/quick_plot $^ --mode density --out_format png --out $@.tmp --title 'data_2d_8.txt y marginal'
+	mv $@.tmp.png $@
+
+img/example_13_a.png: example/data_2d_8.txt
+	mkdir -p $(dir $@)
+	bin/quick_plot $^ --mode density --out_format png --out $@.tmp --title 'data_2d_8.txt y marginal' --columns 2
 	mv $@.tmp.png $@
 
 img/example_14.png: example/data_2d_8.txt
@@ -99,19 +109,19 @@ img/example_16.png: example/anscombe.txt
 	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_i' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
 	mv $@.tmp.png $@
 
-img/example_17.png: example/anscombe_ii.txt
+img/example_17.png: example/anscombe.txt
 	mkdir -p $(dir $@)
-	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_ii' --regression --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_ii' --regression --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend --columns 3,4
 	mv $@.tmp.png $@
 
-img/example_18.png: example/anscombe_iii.txt
+img/example_18.png: example/anscombe.txt
 	mkdir -p $(dir $@)
-	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_iii' --regression --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_iii' --regression --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend --columns 5,6
 	mv $@.tmp.png $@
 
-img/example_19.png: example/anscombe_iv.txt
+img/example_19.png: example/anscombe.txt
 	mkdir -p $(dir $@)
-	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_iv' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_iv' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend --columns 7,8
 	mv $@.tmp.png $@
 
 clean:

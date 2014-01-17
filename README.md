@@ -32,6 +32,8 @@ The input file may contain comment lines (lines that start with #). Files may co
                             needed. default=my_plot
       --mode MODE           plotting mode. may be in (line, scatter, column, bar, hist,
                             tick, barcode, point, contour, density) default=line
+      --columns COLUMNS     two numbers, comma separated, can be reverse order, indicates x,y for
+                            plotting. 1-based.
       --colors COLORS       color palatte mode. may be in (bostock, brewer, mono,
                             hcl_ggplot2) default=brewer
       --alpha ALPHA         alpha value for markers in --mode scatter
@@ -158,11 +160,24 @@ The input file may contain comment lines (lines that start with #). Files may co
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_12.png)
 
+### Plotting 1D data as density curve, one file, selecting column to plot.
+
+    bin/quick_plot example/data_2d_8.txt --mode density --out_format png --out img/example_12_a.png --title 'data_2d_8.txt x marginal' --columns 1
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_12_a.png)
+
+
 ### Plotting 1D data as density curve, one file.
 
     bin/quick_plot example/data_1d_8.txt --mode density --out_format png --out img/example_13.png --title 'data_2d_8.txt y marginal'
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_13.png)
+
+### Plotting 1D data as density curve, one file, selecting column to plot.
+
+    bin/quick_plot example/data_1d_8.txt --mode density --out_format png --out img/example_13_a.png --title 'data_2d_8.txt y marginal' --columns 2
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_13_a.png)
 
 ### Plotting 2D data as contour plot, one file.
 
@@ -176,20 +191,20 @@ The input file may contain comment lines (lines that start with #). Files may co
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_15.png)
 
-### Anscombe's quartet
+### Anscombe's quartet, plotting from a single file with many columns, mixing and matching columns
 
-    bin/quick_plot example/anscombe_i.txt --mode scatter --out_format png --out img/example_16.png --title 'Anscombe_i' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+    bin/quick_plot example/anscombe.txt --mode scatter --out_format png --out img/example_16.png --title 'Anscombe_i' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_16.png)
 
-    bin/quick_plot example/anscombe_ii.txt --mode scatter --out_format png --out img/example_17.png --title 'Anscombe_ii' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+    bin/quick_plot example/anscombe.txt --mode scatter --out_format png --out img/example_17.png --title 'Anscombe_ii' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend --columns 3,4
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_17.png)
 
-    bin/quick_plot example/anscombe_iii.txt --mode scatter --out_format png --out img/example_18.png --title 'Anscombe_iii' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+    bin/quick_plot example/anscombe.txt --mode scatter --out_format png --out img/example_18.png --title 'Anscombe_iii' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend --columns 5,6
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_18.png)
 
-    bin/quick_plot example/anscombe_iv.txt --mode scatter --out_format png --out img/example_19.png --title 'Anscombe_iiv' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend
+    bin/quick_plot example/anscombe.txt --mode scatter --out_format png --out img/example_19.png --title 'Anscombe_iiv' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend --columns 7,8
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_19.png)

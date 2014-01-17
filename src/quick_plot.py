@@ -54,14 +54,74 @@ class BadInput(Exception):
   pass
 
 
-class Data(object):
-  """Class data holds data for plotting
+class Row(object):
+  """ Class Row holds a single line of a file in split format
   """
   def __init__(self):
-    self.data = None  # this will be a list of lists.
+    self.columns = []
+    self.line_number = None
+
+
+class Data(object):
+  """ Class Data holds data from one file for plotting
+  """
+  def __init__(self):
+    self.rows = None  # this will be a list of lists.
     self.x = None  # this will be a numpy array
     self.y = None
     self.label = ''
+
+  def process_data(self, args):
+    i = 1
+    for r in self.rows:
+      x = None
+      y = None
+      if len(args.columns) > 1:
+        x = self._get_element(r, args.columns[0])
+        y = self._get_element(r, args.columns[1])
+        if numpy.isnan(x):
+          continue
+        if args.xmin > x:
+          args.xmin = x
+        if args.xmax < x:
+          args.xmax = x
+      else:
+        y = self._get_element(r, args.columns[0])
+      if numpy.isnan(y):
+        continue
+      if args.ymin > y:
+        args.ymin = y
+      if args.ymax < y:
+        args.ymax = y
+      if x is None:
+        if args.mode in ('scatter', 'line'):
+          x = i
+          if self.x is None:
+            self.x = []
+          self.x.append(x)
+          i += 1
+      else:
+        if self.x is None:
+          self.x = []
+        self.x.append(x)
+      if self.y is None:
+        self.y = []
+      self.y.append(y)
+    if x is not None:
+      self.x = numpy.array(self.x)
+    self.y = numpy.array(self.y)
+
+  def _get_element(self, row, i):
+    """ internal method, retrieve value in row located at index.
+    """
+    try:
+      x = float(row.columns[i])
+    except ValueError:
+      sys.stderr.write(
+        'Bad input when trying to process file %s at column %d on line %d: %s\n'
+        % (self.label, i, row.line_number, ' '.join(row.columns)))
+      raise
+    return x
 
 
 def InitArguments(parser):
@@ -79,10 +139,9 @@ def InitArguments(parser):
                       help=('plotting mode. may be in (line, scatter, '
                             'column, bar, hist, tick, barcode, point, contour, '
                             'density) default=%(default)s'))
-  parser.add_argument('--columns', dest='columns', default='1,2', type=str,
+  parser.add_argument('--columns', dest='columns', default=None, type=str,
                       help=('two numbers, comma separated, can be reverse '
-                            'order, indicates x,y for plotting. '
-                            'default=$(default)s'))
+                            'order, indicates x,y for plotting. 1-based.'))
   parser.add_argument('--colors', dest='colors', default='brewer', type=str,
                       help=('color palatte mode. may be in (bostock, brewer, '
                             'mono, hcl_ggplot2) '
@@ -221,10 +280,24 @@ def CheckArguments(args, parser):
   if args.contour_bin < 3:
     parser.error('--contour_bin must be greater than 3.')
   DefineColors(args)
+  DefineColumns(args)
+
+
+def DefineColumns(args):
+  """ Based on --columns, define columns to use for plotting.
+
+  Args:
+    args: an argparse arguments object
+  """
+  if args.columns is None:
+    if args.mode in ('scatter', 'line', 'contour'):
+      args.columns = '1,2'
+    else:
+      args.columns = '1'
   columns = args.columns.split(',')
   if len(columns) > 2:
     parser.error('Too many --columns specified, can only take 2.')
-  if len(coulmns) < 1:
+  if len(columns) < 1:
     parser.error('Too few --columns specified, needs at least 1.')
   for i in xrange(0, len(columns)):
     try:
@@ -235,9 +308,9 @@ def CheckArguments(args, parser):
       parser.error('--columns input must be a positive non-zero integer')
     columns[i] = x
   if len(columns) == 2:
-    args.columns = columns[0], columns[1]
+    args.columns = [columns[0] - 1, columns[1] - 1]
   else:
-    args.columns = columns[0]
+    args.columns = [columns[0] - 1]
 
 
 def DefineColors(args):
@@ -481,7 +554,8 @@ def PlotDensity(data_list, ax, args):
     if args.density_covariance is not None:
       density.covariance_factor = lambda : args.density_covariance
       density._compute_covariance()  # bad mojo calling privates like this
-    d.data = numpy.array([x_data, density(x_data)])
+    d.x = numpy.array(x_data)
+    d.y = numpy.array(density(x_data))
     density_list.append(d)
   PlotLineScatter(density_list, ax, args)
 
@@ -510,12 +584,15 @@ def PlotContour(data_list, ax, args):
     ax: a matplotlib axis object
     args: an argparse arguments object
   """
+  if len(data_list) > 1:
+    raise BadInput('You cannot create a contour plot with more '
+                   'than one input file')
   data = data_list[0]
   x = data.x
   y = data.y
   H, xedges, yedges = numpy.histogram2d(
-    x, y, range=[[min(x), max(x)], [min(y), max(y)]], bins=(args.contour_bin,
-                                                            args.contour_bin))
+    x, y, range=[[min(x), max(x)], [min(y), max(y)]],
+    bins=(args.contour_bin, args.contour_bin))
   extent = [yedges[0], yedges[-1], xedges[0], xedges[-1]]
   c_max = max(map(max, H))
   c_min = min(map(min, H))
@@ -574,7 +651,7 @@ def PlotLineScatter(data_list, ax, args):
       try:
         w = numpy.linalg.lstsq(A.T, rylist)[0]
       except ValueError:
-        sys.stderr.write('Warning, unable to perform regression!')
+        sys.stderr.write('Warning, unable to perform regression!\n')
         return
 
       sorted_rxlist = numpy.array(sorted(rxlist))
@@ -603,43 +680,35 @@ def ReadFiles(args):
   """
   data_list = []
   for a_file in args.files:
+    num_columns = None
     f = open(a_file, 'r')
-    xlist = []
-    ylist = []
-    i = 0
+    rows = []
+    line_number = 0
     for line in f:
+      line_number += 1
       line = line.strip()
       if line.startswith('#'):
         continue
-      d = line.split()
-      if d[0].lower() == 'nan':
-        continue
-      if len(d) > 1:
-        # two values
-        if d[0].lower() == 'nan' or d[1].lower() == 'nan':
-          continue
-        xlist.append(float(d[0]))
-        ylist.append(float(d[1]))
-        if args.xmin > xlist[-1]:
-          args.xmin = xlist[-1]
-        if args.xmax < xlist[-1]:
-          args.xmax = xlist[-1]
+      r = Row()
+      r.columns = line.split()
+      r.line_number = line_number
+      if num_columns is None:
+        num_columns = len(r.columns)
+        if num_columns < max(args.columns):
+          raise BadInput('Input file %s has only %d columns, you requested a '
+                         'column, %d, which is out of bounds.'
+                         % (a_file, num_columns, max(args.columns)))
       else:
-        ylist.append(float(d[0]))
-        if args.mode in ('scatter', 'line'):
-          xlist.append(i)
-          i += 1
-      if args.ymin > ylist[-1]:
-        args.ymin = ylist[-1]
-      if args.ymax < ylist[-1]:
-        args.ymax = ylist[-1]
+        if num_columns != len(r.columns):
+          raise BadInput('Input file %s had %d columns, switches to %d '
+                         'columns on line %d'
+                         % (a_file, num_columns, len(r.columns), line_number))
+      rows.append(r)
     f.close()
     d = Data()
     d.label = os.path.basename(a_file)
-    if ylist == []:
-      d.data = numpy.array(xlist)
-    else:
-      d.data = numpy.array([xlist, ylist])
+    d.rows = rows
+    d.process_data(args)
     data_list.append(d)
   return data_list
 
