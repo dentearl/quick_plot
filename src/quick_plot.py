@@ -250,7 +250,8 @@ def CheckArguments(args, parser):
     parser: an argparse parser object
   """
   args.recognized_modes = ['line', 'scatter', 'bar', 'column', 'hist',
-                           'tick', 'barcode', 'point', 'contour', 'density']
+                           'histogram', 'tick', 'barcode', 'point', 'contour',
+                           'density']
   if len(args.files) > 0:
     for f in args.files:
       if not os.path.exists(f):
@@ -265,7 +266,9 @@ def CheckArguments(args, parser):
                  'pdf png eps all.' % args.out_format)
   if args.mode not in args.recognized_modes:
     parser.error('Unrecognized --mode %s. Choose one from: %s'
-                 % (args.mode, str(args.recognized_mode)))
+                 % (args.mode, str(args.recognized_modes)))
+  if args.mode == 'histogram':
+    args.mode = 'hist'
   if args.mode == 'contour':
     if len(args.files) > 1:
       parser.error('--mode=contour does not permit more than one file '
