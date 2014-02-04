@@ -8,7 +8,7 @@ A quick plotting program for creating fast sketches of data.
 
 """
 ##############################
-# Copyright (C) 2013 by
+# Copyright (C) 2013-2014 by
 # Dent Earl (dearl@soe.ucsc.edu, dent.earl@gmail.com)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
