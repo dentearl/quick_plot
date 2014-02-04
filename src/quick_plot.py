@@ -55,7 +55,7 @@ class BadInput(Exception):
 
 
 class Row(object):
-  """ Class Row holds a single line of a file in split format
+  """ Class Row holds a single line of a file in split format.
   """
   def __init__(self):
     self.columns = []
@@ -63,7 +63,7 @@ class Row(object):
 
 
 class Data(object):
-  """ Class Data holds data from one file for plotting
+  """ Class Data holds data from one file for plotting.
   """
   def __init__(self):
     self.rows = None  # this will be a list of lists.
@@ -423,7 +423,7 @@ def DefineColors(args):
 
 
 def CorrectColorTuples(args):
-  """Corrects the 0-255 values in colors_light and colors_medium to 0.0-1.0
+  """Corrects the 0-255 values in colors_light and colors_medium to 0.0 - 1.0.
 
   Args:
     args: an argparse arguments object
@@ -461,7 +461,7 @@ def InitImage(args):
 
 
 def EstablishAxes(fig, args):
-  """Create a single axis on the figure object
+  """Create a single axis on the figure object.
 
   Args:
     fig: a matplotlib figure object
@@ -515,7 +515,7 @@ def WriteImage(fig, pdf, args):
 
 
 def ColorPicker(i, args):
-  """Returns a valid matplotlib color based on the index, plot mode and palette
+  """Returns a valid matplotlib color based on the index, plot mode and palette.
 
   Args:
     i: index, integer
