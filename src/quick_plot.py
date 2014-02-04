@@ -125,7 +125,7 @@ class Data(object):
 
 
 def InitArguments(parser):
-  """Initialize arguments for the program.
+  """ Initialize arguments for the program.
 
   Args:
     parser: an argparse parser object
@@ -243,7 +243,7 @@ def InitArguments(parser):
 
 
 def CheckArguments(args, parser):
-  """Verify that input arguments are correct and sufficient.
+  """ Verify that input arguments are correct and sufficient.
 
   Args:
     args: an argparse arguments object
@@ -322,7 +322,7 @@ def DefineColumns(args):
 
 
 def DefineColors(args):
-  """Based on --colors, define the set of colors to use in the plot.
+  """ Based on --colors, define the set of colors to use in the plot.
 
   Args:
     args: an argparse arguments object
@@ -423,7 +423,7 @@ def DefineColors(args):
 
 
 def CorrectColorTuples(args):
-  """Corrects the 0-255 values in colors_light and colors_medium to 0.0 - 1.0.
+  """ Corrects the 0-255 values in colors_light and colors_medium to 0.0 - 1.0.
 
   Args:
     args: an argparse arguments object
@@ -443,7 +443,7 @@ def CorrectColorTuples(args):
 
 
 def InitImage(args):
-  """Initialize a new image.
+  """ Initialize a new image.
 
   Args:
     args: an argparse arguments object
@@ -461,7 +461,7 @@ def InitImage(args):
 
 
 def EstablishAxes(fig, args):
-  """Create a single axis on the figure object.
+  """ Create a single axis on the figure object.
 
   Args:
     fig: a matplotlib figure object
@@ -497,7 +497,7 @@ def EstablishAxes(fig, args):
 
 
 def WriteImage(fig, pdf, args):
-  """Write the image to disk.
+  """ Write the image to disk.
 
   Args:
     fig: a matplotlib figure object
@@ -519,7 +519,7 @@ def WriteImage(fig, pdf, args):
 
 
 def ColorPicker(i, args):
-  """Returns a valid matplotlib color based on the index, plot mode and palette.
+  """ Returns a valid matplotlib color based on the index, plot mode and palette.
 
   Args:
     i: index, integer
@@ -547,7 +547,7 @@ def ColorPicker(i, args):
 
 
 def PlotDensity(data_list, ax, args):
-  """Plot one dimensional data as density curves.
+  """ Plot one dimensional data as density curves.
 
   Args:
     data_list: a list of Data objects
@@ -573,7 +573,7 @@ def PlotDensity(data_list, ax, args):
 
 
 def PlotTwoDimension(data_list, ax, args):
-  """Plot two dimensional data.
+  """ Plot two dimensional data.
 
   Args:
     data_list: a list of Data objects
@@ -589,7 +589,7 @@ def PlotTwoDimension(data_list, ax, args):
 
 
 def PlotContour(data_list, ax, args):
-  """Plot two dimensional density contour.
+  """ Plot two dimensional density contour.
 
   Args:
     data_list: a list of Data objects
@@ -624,7 +624,7 @@ def PlotContour(data_list, ax, args):
 
 
 def PlotLineScatter(data_list, ax, args):
-  """Plot two dimensional line or scatter data.
+  """ Plot two dimensional line or scatter data.
 
   Args:
     data_list: a list of Data objects
@@ -688,7 +688,7 @@ def PlotLineScatter(data_list, ax, args):
 
 
 def ReadFiles(args):
-  """Read and parse all input files.
+  """ Read and parse all input files.
 
   Args:
     args: an argparse arguments object
@@ -733,7 +733,7 @@ def ReadFiles(args):
 
 
 def PlotOneDimension(data_list, ax, args):
-  """Plot one dimensional data.
+  """ Plot one dimensional data.
 
   Args:
     data_list: a list of Data objects.
@@ -751,7 +751,7 @@ def PlotOneDimension(data_list, ax, args):
 
 
 def PlotHistogram(data_list, ax, args):
-  """Plot one dimensional data as histogram.
+  """ Plot one dimensional data as histogram.
 
   Args:
     data_list: a list of Data objects.
@@ -775,7 +775,7 @@ def PlotHistogram(data_list, ax, args):
 
 
 def PlotColumns(data_list, ax, args):
-  """Plot one dimensional data as column / bar plot.
+  """ Plot one dimensional data as column / bar plot.
 
   Args:
     data_list: a list of Data objects.
@@ -806,7 +806,7 @@ def PlotColumns(data_list, ax, args):
 
 
 def GetTickYValues(i, args):
-  """Produce the lower and upper y values for a Tick plot.
+  """ Produce the lower and upper y values for a Tick plot.
 
   Args:
     i: Integer offset of this set of values.
@@ -823,7 +823,7 @@ def GetTickYValues(i, args):
 
 
 def HandleLimits(data_min, data_max, user_min, user_max):
-  """Decides whether to use the data values or user supplied values.
+  """ Decides whether to use the data values or user supplied values.
 
   Args:
     data_min: minimum value from the data
@@ -844,7 +844,7 @@ def HandleLimits(data_min, data_max, user_min, user_max):
 
 
 def PlotTicks(data_list, ax, args):
-  """Plot one dimensional data as tick marks on a line.
+  """ Plot one dimensional data as tick marks on a line.
 
   Args:
     data_list: a list of Data objects
@@ -882,7 +882,7 @@ def PlotTicks(data_list, ax, args):
 
 
 def GetPointYValues(n, i, args):
-  """Produce the y values for a Point plot.
+  """ Produce the y values for a Point plot.
 
   Args:
     n: number of values to produce.
@@ -899,7 +899,7 @@ def GetPointYValues(n, i, args):
 
 
 def PlotPoints(data_list, ax, args):
-  """Plot one dimensional data as points on a line.
+  """ Plot one dimensional data as points on a line.
 
   Args:
     data_list: a list of Data objects
@@ -936,7 +936,7 @@ def PlotPoints(data_list, ax, args):
 
 
 def PlotData(data_list, ax, args):
-  """Plot all of the data according to input arguments.
+  """ Plot all of the data according to input arguments.
 
   Args:
     data_list: a list of Data objects.
@@ -950,7 +950,7 @@ def PlotData(data_list, ax, args):
 
 
 def MakeProxyPlots(args):
-  """Make some proxy plots for use with legends.
+  """ Make some proxy plots for use with legends.
 
   Proxy plots are plots that are not actually drawn but whose
   colors are used for correctly populating a legend.
@@ -981,7 +981,7 @@ def MakeProxyPlots(args):
 
 
 def MakeLegendLabels(args):
-  """Make labels for use with legends.
+  """ Make labels for use with legends.
 
   Args:
     args: an argparse argument object
@@ -996,7 +996,7 @@ def MakeLegendLabels(args):
 
 
 def CleanAxis(ax, args):
-  """Clean the axis up, apply scales, add legend.
+  """ Clean the axis up, apply scales, add legend.
 
   Args:
     ax: a matplotlib axis object
