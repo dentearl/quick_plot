@@ -472,10 +472,14 @@ def EstablishAxes(fig, args):
   Raises:
     ValueError: If an unknown spine location is passed.
   """
-  args.axLeft = 0.11
-  args.axWidth = 0.83
-  args.axBottom = 0.17
-  args.axHeight = 0.76
+  # left 0.99 inches, right 0.54 inches, width 7.47 inches
+  # bottom 0.68 inches, top 0.28 inches, height 3.04 inches
+  args.axLeft = 0.99 / args.width
+  args.axRight = 1.0 - (0.54 / args.width)
+  args.axWidth = args.axRight - args.axLeft
+  args.axBottom = 0.68 / args.height
+  args.axTop = 1.0 - (0.28 / args.height)
+  args.axHeight = args.axTop - args.axBottom
   ax = fig.add_axes([args.axLeft, args.axBottom,
                      args.axWidth, args.axHeight])
   ax.yaxis.set_major_locator(pylab.NullLocator())
