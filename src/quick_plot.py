@@ -678,7 +678,9 @@ def PlotLineScatter(data_list, ax, args):
       ax.text(x=(rxlist[0] + rxlist[-1]) / 2.0,
               y=(fitline[0] + fitline[-1]) / 2.0,
               s=('%f * x %s %f,\n$r^2$=%f, $p$=%f'
-                 % (w[0], op, w[1], r_value * r_value, p_value)))
+                 % (w[0], op, w[1], r_value * r_value, p_value)),
+              verticalalignment='bottom',
+              horizontalalignment='center')
 
 
 def ReadFiles(args):
