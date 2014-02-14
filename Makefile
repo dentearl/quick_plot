@@ -1,6 +1,6 @@
 SHELL:=/bin/bash -e
 export SHELLOPTS=pipefail
-image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 12_a 13 13_a 14 15 16 17 18 19, img/example_$(i).png)
+image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 12_a 13 13_a 14 15 16 17 18 19 20 21 22, img/example_$(i).png)
 
 .PHONY = clean images
 
@@ -122,6 +122,21 @@ img/example_18.png: example/anscombe.txt
 img/example_19.png: example/anscombe.txt
 	mkdir -p $(dir $@)
 	bin/quick_plot $^ --mode scatter --out_format png --out $@.tmp --title 'Anscombe_iv' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend --columns 7,8
+	mv $@.tmp.png $@
+
+img/example_20.png: example/distance_matrix.txt
+	mkdir -p $(dir $@)
+	bin/quick_plot $^ --mode matrix --out_format png --out $@.tmp --title 'Heatmap' --matrix_cmap Reds --width 6
+	mv $@.tmp.png $@
+
+img/example_21.png: example/distance_matrix_1.txt
+	mkdir -p $(dir $@)
+	bin/quick_plot $^ --mode matrix --out_format png --out $@.tmp --title 'Heatmap 2' --width 6 --matrix_discritize_colormap 6
+	mv $@.tmp.png $@
+
+img/example_22.png: example/distance_matrix_2.txt
+	mkdir -p $(dir $@)
+	bin/quick_plot $^ --mode matrix --out_format png --out $@.tmp --title 'Heatmap 3' --matrix_cmap Oranges --width 6 --matrix_discritize_colormap 10 --matrix_no_colorbar
 	mv $@.tmp.png $@
 
 clean:

@@ -49,6 +49,8 @@ import os
 from scipy.stats import scoreatpercentile, linregress, gaussian_kde
 import sys
 
+COLOR_MAPS = [m for m in plt.cm.datad if not m.endswith("_r")]
+
 
 class BadInput(Exception):
   pass
@@ -70,8 +72,8 @@ class Data(object):
     self.x = None  # this will be a numpy array
     self.y = None
     self.label = ''
-
   def process_data(self, args):
+    self._create_matrix(args)
     i = 1
     for r in self.rows:
       x = None
@@ -110,7 +112,14 @@ class Data(object):
     if x is not None:
       self.x = numpy.array(self.x)
     self.y = numpy.array(self.y)
-
+  def reverse_matrix_rows(self):
+    """ reverse the matrix row order for matrix plotting.
+    """
+    self.matrix = self.matrix[::-1, :]
+  def reverse_matrix_cols(self):
+    """ reverse the matrix column order for matrix plotting.
+    """
+    self.matrix = self.matrix[:, ::-1]
   def _get_element(self, row, i):
     """ internal method, retrieve value in row located at index.
     """
@@ -122,6 +131,23 @@ class Data(object):
         % (self.label, i, row.line_number, ' '.join(row.columns)))
       raise
     return x
+  def _create_matrix(self, args):
+    """ inspect self.rows and try to create a single data matrix from all input.
+    """
+    num_rows = len(self.rows)
+    num_cols = len(self.rows[0].columns)
+    for i in xrange(0, num_rows):
+      if len(self.rows[i].columns) > num_cols:
+        self.matrix = None
+        # this is an error state, all rows need to have same number of columns
+        return
+      self.matrix = numpy.zeros((num_rows, num_cols), dtype=float)
+    for i in xrange(0, len(self.rows)):
+      for j in xrange(0, len(self.rows[i].columns)):
+        try:
+          self.matrix[i][j] = self._get_element(self.rows[i], j)
+        except ValueError:
+          pass
 
 
 def InitArguments(parser):
@@ -138,7 +164,7 @@ def InitArguments(parser):
   parser.add_argument('--mode', dest='mode', default='line', type=str,
                       help=('plotting mode. may be in (line, scatter, '
                             'column, bar, hist, tick, barcode, point, contour, '
-                            'density) default=%(default)s'))
+                            'density, matrix) default=%(default)s'))
   parser.add_argument('--columns', dest='columns', default=None, type=str,
                       help=('two numbers, comma separated, can be reverse '
                             'order, indicates x,y for plotting. 1-based.'))
@@ -216,7 +242,7 @@ def InitArguments(parser):
   parser.add_argument('--aspect_equal', dest='aspect_equal', default=False,
                       action='store_true',
                       help='Turn on equal aspect ratio for the plot')
-  contour = parser.add_argument_group('contour')
+  contour = parser.add_argument_group('contour mode')
   contour.add_argument('--contour_bin', dest='contour_bin', default=10,
                        type=int,
                        help=('Bin size of the contour plot. Smaller integers '
@@ -229,7 +255,7 @@ def InitArguments(parser):
                        default=6, type=int,
                        help=('The number of levels in the contour plot, '
                              'default=%(default)s'))
-  density = parser.add_argument_group('density')
+  density = parser.add_argument_group('density mode')
   density.add_argument('--density_covariance', dest='density_covariance',
                        type=float,
                        help=('Gaussian kernel density estimate covariance, '
@@ -240,6 +266,21 @@ def InitArguments(parser):
                        default=200,
                        help=('Number of "bins" for the density curve. '
                              'default=%(default)s'))
+  matrix = parser.add_argument_group('matrix mode')
+  matrix.add_argument('--matrix_matshow', default=False, action='store_true',
+                      help=('Switches the drawing call from pcolor() to '
+                            'matshow(). matshow() uses rasters, pcolor() uses '
+                            'vectors. For very large matrices matshow() may be '
+                            'desirable.'))
+  matrix.add_argument('--matrix_cmap', type=str, default='binary',
+                      help=('The colormap to be used. default=%(default)s. '
+                            'Possible values: ' + '%s' % ', '.join(COLOR_MAPS)))
+  matrix.add_argument('--matrix_no_colorbar', default=False,
+                      action='store_true',
+                      help='turn off the colorbar.')
+  matrix.add_argument('--matrix_discritize_colormap', type=int, default=0,
+                      help='number of bins to discritize colormap')
+
 
 
 def CheckArguments(args, parser):
@@ -251,7 +292,7 @@ def CheckArguments(args, parser):
   """
   args.recognized_modes = ['line', 'scatter', 'bar', 'column', 'hist',
                            'histogram', 'tick', 'barcode', 'point', 'contour',
-                           'density']
+                           'density', 'matrix']
   if len(args.files) > 0:
     for f in args.files:
       if not os.path.exists(f):
@@ -289,6 +330,10 @@ def CheckArguments(args, parser):
   DefineColumns(args)
   if args.random_seed is not None and args.jitter:
     numpy.random.seed(seed=args.random_seed)
+  if (args.matrix_discritize_colormap == 1 or
+      args.matrix_discritize_colormap < 0):
+    parser.error('--matrix_discritize_colormap must be either 0, '
+                 'or greater than 1')
 
 
 def DefineColumns(args):
@@ -420,6 +465,9 @@ def DefineColors(args):
                        ]
   if isinstance(args.colors_light[0], tuple):
     CorrectColorTuples(args)
+  if args.matrix_cmap not in COLOR_MAPS:
+    parser.error('--cmap %s not a valid option. Pick from %s'
+                 % (args.matrix_cmap, ', '.join(COLOR_MAPS)))
 
 
 def CorrectColorTuples(args):
@@ -572,6 +620,44 @@ def PlotDensity(data_list, ax, args):
   PlotLineScatter(density_list, ax, args)
 
 
+def PlotMatrix(data_list, ax, args):
+  """ Plot a matrix as a 2D matrix.
+
+  Args:
+    data_list: a list of Data objects
+    ax: a matplotlib axis object
+    args: an argparse arguments object
+  """
+  if len(data_list) > 1:
+    raise BadInput('You cannot create a contour plot with more '
+                   'than one input file')
+  data = data_list[0]
+  data.reverse_matrix_rows()
+  data.reverse_matrix_cols()
+  cmap = plt.get_cmap(args.matrix_cmap)
+  norm = None
+  if args.matrix_discritize_colormap:
+    cmap_list = [cmap(i) for i in range(cmap.N)]
+    cmap = cmap.from_list('Discritized', cmap_list, cmap.N)
+    bounds = numpy.linspace(numpy.min(numpy.min(data.matrix)),
+                            numpy.max(numpy.max(data.matrix)),
+                            args.matrix_discritize_colormap + 1)
+    norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+  if args.matrix_matshow:
+    plt.matshow(data.matrix, fignum=False, origin='upper',
+                cmap=cmap, norm=norm)
+  else:
+    plt.pcolor(data.matrix, cmap=cmap, norm=norm)
+  if not args.matrix_no_colorbar:
+    cb = plt.colorbar()
+    cb.outline.set_linewidth(0)
+  ax.xaxis.set_ticks_position('none')
+  ax.xaxis.set_ticks([])
+  ax.yaxis.set_ticks_position('none')
+  ax.yaxis.set_ticks([])
+  plt.box(on=False)
+
+
 def PlotTwoDimension(data_list, ax, args):
   """ Plot two dimensional data.
 
@@ -586,6 +672,8 @@ def PlotTwoDimension(data_list, ax, args):
     PlotContour(data_list, ax, args)
   elif args.mode == 'density':
     PlotDensity(data_list, ax, args)
+  elif args.mode == 'matrix':
+    PlotMatrix(data_list, ax, args)
 
 
 def PlotContour(data_list, ax, args):
@@ -943,7 +1031,7 @@ def PlotData(data_list, ax, args):
     ax: a matplotlib axis object.
     args: an argparse argument object.
   """
-  if args.mode in ('scatter', 'line', 'contour', 'density'):
+  if args.mode in ('scatter', 'line', 'contour', 'density', 'matrix'):
     PlotTwoDimension(data_list, ax, args)
   elif args.mode in ('bar', 'column', 'hist', 'tick', 'barcode', 'point'):
     PlotOneDimension(data_list, ax, args)
@@ -1036,13 +1124,13 @@ def CleanAxis(ax, args):
     ax.set_title(args.title)
   # legend
   if args.is_legend:
-    if args.mode not in ('contour'):
+    if args.mode not in ['contour', 'matrix']:
       proxy_plots = MakeProxyPlots(args)
       legend_labels = MakeLegendLabels(args)
       leg = plt.legend(proxy_plots, legend_labels, 'upper right', numpoints=1)
       leg._drawFrame = False
   # aspect ratio
-  if args.aspect_equal:
+  if args.aspect_equal or args.mode == 'matrix':
     ax.axis('equal')
 
 
