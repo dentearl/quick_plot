@@ -28,14 +28,17 @@ The input file may contain comment lines (lines that start with #). Files may co
 
     optional arguments:
       -h, --help            show this help message and exit
-      --out OUT             path/filename where figure will be created. No extension
-                            needed. default=my_plot
-      --mode MODE           plotting mode. may be in (line, scatter, column, bar, hist,
-                            tick, barcode, point, contour, density) default=line
+      --out OUT             path/filename where figure will be created. No extension needed.
+                            default=my_plot
+      --mode MODE           plotting mode. may be in (line, scatter, column, bar, hist, tick, barcode,
+                            point, contour, density, matrix) default=line
       --columns COLUMNS     two numbers, comma separated, can be reverse order, indicates x,y for
                             plotting. 1-based.
-      --colors COLORS       color palatte mode. may be in (bostock, brewer, mono,
-                            hcl_ggplot2) default=brewer
+      --colors COLORS       color palatte mode. may be in (bostock, brewer, mono, hcl_ggplot2)
+                            default=brewer
+      --color_index_offset COLOR_INDEX_OFFSET
+                            index offset value to shift the starting point of the selected color map.
+                            default=0
       --alpha ALPHA         alpha value for markers in --mode scatter
       --dot_size MARKERSIZE, --markersize MARKERSIZE
                             value for markers in --mode scatter
@@ -53,32 +56,47 @@ The input file may contain comment lines (lines that start with #). Files may co
       --ymax USER_YMAX      ymax value.
       --height HEIGHT       height of image, in inches. default=4.0
       --width WIDTH         width of image, in inches. default=9.0
-      --dpi DPI             dots per inch of raster outputs, i.e. if --outFormat is all or
-                            png. default=300
+      --dpi DPI             dots per inch of raster outputs, i.e. if --outFormat is all or png.
+                            default=300
       --out_format OUT_FORMAT
                             output format [pdf|png|eps|all]. default=pdf
-      --no_legend           Turns off the filename / color legend. Helpful for large
-                            numbers of files.
+      --no_legend           Turns off the filename / color legend. Helpful for large numbers of files.
       --regression          turn on a simple linear regression line
       --jitter              turn on jitter for certain plotting modes
+      --random_seed RANDOM_SEED
+                            Random seed for use with --jitter flag.
       --aspect_equal        Turn on equal aspect ratio for the plot
 
-    contour:
+    contour mode:
       --contour_bin CONTOUR_BIN
-                            Bin size of the contour plot. Smaller integers lead to
-                            smoother curves.
+                            Bin size of the contour plot. Smaller integers lead to smoother curves.
       --contour_logspace    Switch the contour lines from linear spacing to log spacing
       --contour_num_levels CONTOUR_NUM_LEVELS
                             The number of levels in the contour plot, default=6
 
-    density:
+    density mode:
       --density_covariance DENSITY_COVARIANCE
-                            Gaussian kernel density estimate covariance, raising the value
-                            leads to smoother curves. This roughly corresponds to
-                            bandwidth in R. Default is to discover the value
-                            automatically.
+                            Gaussian kernel density estimate covariance, raising the value leads to
+                            smoother curves. This roughly corresponds to bandwidth in R. Default is to
+                            discover the value automatically.
       --density_num_bins DENSITY_NUM_BINS
                             Number of "bins" for the density curve. default=200
+
+    matrix mode:
+      --matrix_matshow      Switches the drawing call from pcolor() to matshow(). matshow() uses rasters,
+                            pcolor() uses vectors. For very large matrices matshow() may be desirable.
+      --matrix_cmap MATRIX_CMAP
+                            The colormap to be used. default=binary. Possible values: Spectral, summer,
+                            coolwarm, Set1, Set2, Set3, Dark2, hot, RdPu, YlGnBu, RdYlBu, gist_stern,
+                            cool, gray, GnBu, gist_ncar, gist_rainbow, bone, RdYlGn, spring, terrain,
+                            PuBu, spectral, gist_yarg, BuGn, bwr, cubehelix, YlOrRd, Greens, PRGn,
+                            gist_heat, Paired, hsv, Pastel2, Pastel1, BuPu, copper, OrRd, brg, gnuplot2,
+                            jet, gist_earth, Oranges, PiYG, YlGn, Accent, gist_gray, flag, BrBG, Reds,
+                            RdGy, PuRd, Blues, Greys, autumn, pink, binary, winter, gnuplot, RdBu, prism,
+                            YlOrBr, rainbow, seismic, Purples, ocean, PuOr, PuBuGn, afmhot
+      --matrix_no_colorbar  turn off the colorbar.
+      --matrix_discritize_colormap MATRIX_DISCRITIZE_COLORMAP
+                            number of bins to discritize colormap
 
 
 ## Examples
@@ -209,3 +227,15 @@ The input file may contain comment lines (lines that start with #). Files may co
     bin/quick_plot example/anscombe.txt --mode scatter --out_format png --out img/example_19.png --title 'Anscombe_iiv' --regression  --markersize 5.0 --ymin 3 --ymax 13 --xmin 3 --xmax 20 --no_legend --columns 7,8
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_19.png)
+
+    bin/quick_plot example/distance_matrix.txt --mode matrix --out_format png --out img/example_20.png --title 'Heatmap' --matrix_cmap Reds --width 6
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_20.png)
+
+    bin/quick_plot example/distance_matrix_1.txt --mode matrix --out_format png --out img/example_21.png --title 'Heatmap 2' --width 6 --matrix_discritize_colormap 6
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_21.png)
+
+    bin/quick_plot example/distance_matrix_2.txt --mode matrix --out_format png --out img/example_22.png --title 'Heatmap 3' --matrix_cmap Oranges --width 6 --matrix_discritize_colormap 10 --matrix_no_colorbar
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_22.png)
