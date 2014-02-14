@@ -279,7 +279,11 @@ def InitArguments(parser):
                       action='store_true',
                       help='turn off the colorbar.')
   matrix.add_argument('--matrix_discritize_colormap', type=int, default=0,
-                      help='number of bins to discritize colormap')
+                      help='Number of bins to discritize colormap')
+  matrix.add_argument('--matrix_colormap_min', type=float,
+                      help='Lower bound of colormap')
+  matrix.add_argument('--matrix_colormap_max', type=float,
+                      help='Upper bound of colormap')
 
 
 
@@ -639,9 +643,15 @@ def PlotMatrix(data_list, ax, args):
   if args.matrix_discritize_colormap:
     cmap_list = [cmap(i) for i in range(cmap.N)]
     cmap = cmap.from_list('Discritized', cmap_list, cmap.N)
-    bounds = numpy.linspace(numpy.min(numpy.min(data.matrix)),
-                            numpy.max(numpy.max(data.matrix)),
-                            args.matrix_discritize_colormap + 1)
+    if args.matrix_colormap_min is not None:
+      lb = args.matrix_colormap_min
+    else:
+      lb = numpy.min(numpy.min(data.matrix))
+    if args.matrix_colormap_max is not None:
+      ub = args.matrix_colormap_max
+    else:
+      ub = numpy.max(numpy.max(data.matrix)),
+    bounds = numpy.linspace(lb, ub, args.matrix_discritize_colormap + 1)
     norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
   if args.matrix_matshow:
     plt.matshow(data.matrix, fignum=False, origin='upper',

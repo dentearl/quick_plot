@@ -234,6 +234,12 @@ The input file may contain comment lines (lines that start with #). Files may co
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_20.png)
 
+### Matrix plot (heatmap) using a continuous colormap, censoring colormap
+
+    bin/quick_plot example/distance_matrix.txt --mode matrix --out_format png --out img/example_20_a.png --title 'Heatmap' --matrix_cmap Reds --width 6 --matrix_colormap_max 0.20
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_20_a.png)
+
 ### Heatmap using a discritized colormap
 
     bin/quick_plot example/distance_matrix_1.txt --mode matrix --out_format png --out img/example_21.png --title 'Heatmap 2' --width 6 --matrix_discritize_colormap 6

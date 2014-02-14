@@ -1,6 +1,6 @@
 SHELL:=/bin/bash -e
 export SHELLOPTS=pipefail
-image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 12_a 13 13_a 14 15 16 17 18 19 20 21 22, img/example_$(i).png)
+image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 12_a 13 13_a 14 15 16 17 18 19 20 20_a 21 22, img/example_$(i).png)
 
 .PHONY = clean images
 
@@ -127,6 +127,11 @@ img/example_19.png: example/anscombe.txt
 img/example_20.png: example/distance_matrix.txt
 	mkdir -p $(dir $@)
 	bin/quick_plot $^ --mode matrix --out_format png --out $@.tmp --title 'Heatmap' --matrix_cmap Reds --width 6
+	mv $@.tmp.png $@
+
+img/example_20_a.png: example/distance_matrix.txt
+	mkdir -p $(dir $@)
+	bin/quick_plot $^ --mode matrix --out_format png --out $@.tmp --title 'Heatmap' --matrix_cmap Reds --width 6 --matrix_colormap_max 0.20
 	mv $@.tmp.png $@
 
 img/example_21.png: example/distance_matrix_1.txt
