@@ -624,6 +624,27 @@ def PlotDensity(data_list, ax, args):
   PlotLineScatter(density_list, ax, args)
 
 
+def HandleColormapLimits(data, args):
+  """ Return appropriate values for upper and lower bound colorbar limits.
+
+  Args:
+    data: a Data object
+    args: an argparse arguments object
+  Returns:
+    lb: a lower bound value for the map
+    ub: an upper bound value for the map
+  """
+  if args.matrix_colormap_min is not None:
+    lb = args.matrix_colormap_min
+  else:
+    lb = numpy.min(numpy.min(data.matrix))
+  if args.matrix_colormap_max is not None:
+    ub = args.matrix_colormap_max
+  else:
+    ub = numpy.max(numpy.max(data.matrix))
+  return lb, ub
+
+
 def PlotMatrix(data_list, ax, args):
   """ Plot a matrix as a 2D matrix.
 
@@ -639,20 +660,15 @@ def PlotMatrix(data_list, ax, args):
   data.reverse_matrix_rows()
   data.reverse_matrix_cols()
   cmap = plt.get_cmap(args.matrix_cmap)
-  norm = None
+  cmap_lb, cmap_ub = HandleColormapLimits(data, args)
   if args.matrix_discritize_colormap:
     cmap_list = [cmap(i) for i in range(cmap.N)]
     cmap = cmap.from_list('Discritized', cmap_list, cmap.N)
-    if args.matrix_colormap_min is not None:
-      lb = args.matrix_colormap_min
-    else:
-      lb = numpy.min(numpy.min(data.matrix))
-    if args.matrix_colormap_max is not None:
-      ub = args.matrix_colormap_max
-    else:
-      ub = numpy.max(numpy.max(data.matrix)),
-    bounds = numpy.linspace(lb, ub, args.matrix_discritize_colormap + 1)
+    bounds = numpy.linspace(cmap_lb, cmap_ub,
+                            args.matrix_discritize_colormap + 1)
     norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+  else:
+    norm = matplotlib.colors.Normalize(vmin=cmap_lb, vmax=cmap_ub)
   if args.matrix_matshow:
     plt.matshow(data.matrix, fignum=False, origin='upper',
                 cmap=cmap, norm=norm)
@@ -661,6 +677,8 @@ def PlotMatrix(data_list, ax, args):
   if not args.matrix_no_colorbar:
     cb = plt.colorbar()
     cb.outline.set_linewidth(0)
+    if not args.matrix_discritize_colormap:
+      cb.set_clim(cmap_lb, cmap_ub)  # colormap limits for continuous
   ax.xaxis.set_ticks_position('none')
   ax.xaxis.set_ticks([])
   ax.yaxis.set_ticks_position('none')
