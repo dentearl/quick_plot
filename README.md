@@ -34,6 +34,9 @@ The input file may contain comment lines (lines that start with #). Files may co
                             point, contour, density, matrix) default=line
       --columns COLUMNS     two numbers, comma separated, can be reverse order, indicates x,y for
                             plotting. 1-based.
+      --downsample DOWNSAMPLE
+                            Randomly sample only n values from each input. Can help cutdown on runtime
+                            and output size for pdfs.
       --colors COLORS       color palatte mode. may be in (bostock, brewer, mono, hcl_ggplot2)
                             default=brewer
       --color_index_offset COLOR_INDEX_OFFSET
@@ -64,7 +67,7 @@ The input file may contain comment lines (lines that start with #). Files may co
       --regression          turn on a simple linear regression line
       --jitter              turn on jitter for certain plotting modes
       --random_seed RANDOM_SEED
-                            Random seed for use with --jitter flag.
+                            Random seed for use with --jitter and --downsample flags.
       --aspect_equal        Turn on equal aspect ratio for the plot
 
     contour mode:
@@ -172,6 +175,20 @@ The input file may contain comment lines (lines that start with #). Files may co
     bin/quick_plot example/data_2d_8.txt --mode scatter --markersize 5.0 --alpha 0.1 --out_format png --out img/example_11_a.png --aspect_equal
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11_a.png)
+
+### Plotting 2D data as scatter plot using downsampling, fixing the aspect ratio, one file.
+(Remove the <code>--random_seed</code> for production use).
+
+    bin/quick_plot example/data_2d_8.txt --mode scatter --markersize 5.0 --alpha 0.1 --out_format png --out img/example_11_b.png --aspect_equal --random_seed=127 --downsample 1000 --title 'Downsampled to 1000 points'
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11_b.png)
+
+### Plotting 2D data as scatter plot with alpha transparency, fixing the aspect ratio, one file.
+(Remove the <code>--random_seed</code> for production use).
+
+    bin/quick_plot example/data_2d_8.txt --mode scatter --markersize 5.0 --alpha 0.1 --out_format png --out img/example_11_c.png --aspect_equal --random_seed=127 --downsample 100 --title 'Downsampled to 100 points'
+
+![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11_c.png)
 
 ### Plotting 1D data as density curve, one file.
 

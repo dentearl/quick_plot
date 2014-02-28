@@ -48,6 +48,7 @@ from argparse import ArgumentParser
 import os
 from scipy.stats import scoreatpercentile, linregress, gaussian_kde
 import sys
+import random
 
 COLOR_MAPS = [m for m in plt.cm.datad if not m.endswith("_r")]
 
@@ -168,6 +169,10 @@ def InitArguments(parser):
   parser.add_argument('--columns', dest='columns', default=None, type=str,
                       help=('two numbers, comma separated, can be reverse '
                             'order, indicates x,y for plotting. 1-based.'))
+  parser.add_argument('--downsample', default=None, type=int,
+                      help=('Randomly sample only n values from each input. '
+                            'Can help cutdown on runtime and output size '
+                            'for pdfs.'))
   parser.add_argument('--colors', dest='colors', default='brewer', type=str,
                       help=('color palatte mode. may be in (bostock, brewer, '
                             'mono, hcl_ggplot2) '
@@ -238,7 +243,8 @@ def InitArguments(parser):
                       help='turn on jitter for certain plotting modes')
   parser.add_argument('--random_seed', dest='random_seed', default=None,
                       type=int,
-                      help='Random seed for use with --jitter flag.')
+                      help=('Random seed for use with --jitter and '
+                            '--downsample  flags.'))
   parser.add_argument('--aspect_equal', dest='aspect_equal', default=False,
                       action='store_true',
                       help='Turn on equal aspect ratio for the plot')
@@ -334,6 +340,8 @@ def CheckArguments(args, parser):
   DefineColumns(args)
   if args.random_seed is not None and args.jitter:
     numpy.random.seed(seed=args.random_seed)
+  if args.random_seed is not None and args.downsample:
+    random.seed(args.random_seed)
   if (args.matrix_discritize_colormap == 1 or
       args.matrix_discritize_colormap < 0):
     parser.error('--matrix_discritize_colormap must be either 0, '
@@ -810,8 +818,8 @@ def ReadFiles(args):
     args: an argparse arguments object
 
   Returns:
-    data_list: a list of numpy arrays of dimension (n by 1) or (n by 2)
-      depending on the --mode flag.
+    data_list: a list of numpy arrays of dimension (n by c) where
+      n is the number of observations and c is the number of columns.
   """
   data_list = []
   for a_file in args.files:
@@ -842,6 +850,9 @@ def ReadFiles(args):
     f.close()
     d = Data()
     d.label = os.path.basename(a_file)
+    if args.downsample:
+      if len(rows) > args.downsample:
+        rows = random.sample(rows, args.downsample)
     d.rows = rows
     d.process_data(args)
     data_list.append(d)

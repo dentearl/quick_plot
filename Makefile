@@ -1,6 +1,6 @@
 SHELL:=/bin/bash -e
 export SHELLOPTS=pipefail
-image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 12 12_a 13 13_a 14 15 16 17 18 19 20 20_a 21 22, img/example_$(i).png)
+image_files = $(foreach i, 01 02 03 04 05 06 07 08 09 10 11 11_a 11_b 11_c 12 12_a 13 13_a 14 15 16 17 18 19 20 20_a 21 22, img/example_$(i).png)
 
 .PHONY = clean images
 
@@ -72,6 +72,16 @@ img/example_11.png: example/data_2d_8.txt
 img/example_11_a.png: example/data_2d_8.txt
 	mkdir -p $(dir $@)
 	bin/quick_plot $^ --mode scatter --markersize 5.0 --out_format png --out $@.tmp --alpha 0.1  --aspect_equal
+	mv $@.tmp.png $@
+
+img/example_11_b.png: example/data_2d_8.txt
+	mkdir -p $(dir $@)
+	bin/quick_plot $^ --mode scatter --markersize 5.0 --out_format png --out $@.tmp --aspect_equal --downsample 1000 --random_seed=127 --title 'Downsampled to 1000 points'
+	mv $@.tmp.png $@
+
+img/example_11_c.png: example/data_2d_8.txt
+	mkdir -p $(dir $@)
+	bin/quick_plot $^ --mode scatter --markersize 5.0 --out_format png --out $@.tmp --aspect_equal --downsample 100 --random_seed=127 --title 'Downsampled to 100 points'
 	mv $@.tmp.png $@
 
 img/example_12.png: example/data_1d_7.txt
