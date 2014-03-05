@@ -74,7 +74,8 @@ class Data(object):
     self.y = None
     self.label = ''
   def process_data(self, args):
-    self._create_matrix(args)
+    if args.mode == 'matrix':
+      self._create_matrix(args)
     i = 1
     for r in self.rows:
       x = None
@@ -130,7 +131,6 @@ class Data(object):
       sys.stderr.write(
         'Bad input when trying to process file %s at column %d on line %d: %s\n'
         % (self.label, i, row.line_number, ' '.join(row.columns)))
-      raise
     return x
   def _create_matrix(self, args):
     """ inspect self.rows and try to create a single data matrix from all input.
@@ -337,7 +337,7 @@ def CheckArguments(args, parser):
   if args.contour_bin < 3:
     parser.error('--contour_bin must be greater than 3.')
   DefineColors(args)
-  DefineColumns(args)
+  DefineColumns(args, parser)
   if args.random_seed is not None and args.jitter:
     numpy.random.seed(seed=args.random_seed)
   if args.random_seed is not None and args.downsample:
@@ -348,7 +348,7 @@ def CheckArguments(args, parser):
                  'or greater than 1')
 
 
-def DefineColumns(args):
+def DefineColumns(args, parser):
   """ Based on --columns, define columns to use for plotting.
 
   Args:
@@ -372,10 +372,9 @@ def DefineColumns(args):
     if x < 1:
       parser.error('--columns input must be a positive non-zero integer')
     columns[i] = x
-  if len(columns) == 2:
-    args.columns = [columns[0] - 1, columns[1] - 1]
-  else:
-    args.columns = [columns[0] - 1]
+  args.columns = []
+  for i in xrange(0, len(columns)):
+    args.columns.append(columns[i] - 1)
 
 
 def DefineColors(args):
