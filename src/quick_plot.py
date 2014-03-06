@@ -843,8 +843,9 @@ def ReadFiles(args):
       else:
         if num_columns != len(r.columns):
           raise BadInput('Input file %s had %d columns, switches to %d '
-                         'columns on line %d'
-                         % (a_file, num_columns, len(r.columns), line_number))
+                         'columns on line %d:\n%s\n'
+                         % (a_file, num_columns, len(r.columns),
+                            line_number, line))
       rows.append(r)
     f.close()
     d = Data()
