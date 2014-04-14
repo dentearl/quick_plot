@@ -578,7 +578,7 @@ def WriteImage(fig, pdf, args):
 
 
 def ColorPicker(i, args):
-  """ Returns a valid matplotlib color based on the index, plot mode and palette.
+  """ Returns a valid matplotlib color based on the index, plot mode & palette.
 
   Args:
     i: index, integer
