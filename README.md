@@ -176,14 +176,14 @@ The input file may contain comment lines (lines that start with #). Files may co
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11_a.png)
 
-### Plotting 2D data as scatter plot using downsampling, fixing the aspect ratio, one file.
+### Plotting 2D data as scatter plot using downsampling to 1000 points, fixing the aspect ratio, one file.
 (Remove the <code>--random_seed</code> for production use).
 
-    bin/quick_plot example/data_2d_8.txt --mode scatter --markersize 5.0 --alpha 0.1 --out_format png --out img/example_11_b.png --aspect_equal --random_seed=127 --downsample 1000 --title 'Downsampled to 1000 points'
+    bin/quick_plot example/data_2d_8.txt --mode scatter --markersize 5.0 --out_format png --out img/example_11_b.png --aspect_equal --random_seed=127 --downsample 1000 --title 'Downsampled to 1000 points'
 
 ![Example image](https://github.com/dentearl/quick_plot/raw/master/img/example_11_b.png)
 
-### Plotting 2D data as scatter plot with alpha transparency, fixing the aspect ratio, one file.
+### Plotting 2D data as scatter plot using downsampling to 100 points, fixing the aspect ratio, one file.
 (Remove the <code>--random_seed</code> for production use).
 
     bin/quick_plot example/data_2d_8.txt --mode scatter --markersize 5.0 --alpha 0.1 --out_format png --out img/example_11_c.png --aspect_equal --random_seed=127 --downsample 100 --title 'Downsampled to 100 points'
