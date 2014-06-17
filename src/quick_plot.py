@@ -72,6 +72,7 @@ class Data(object):
     self.rows = None  # this will be a list of lists.
     self.x = None  # this will be a numpy array
     self.y = None
+    self.xtick_labels = None
     self.label = ''
   def process_data(self, args):
     if args.mode == 'matrix':
@@ -80,7 +81,9 @@ class Data(object):
     for r in self.rows:
       x = None
       y = None
+      label = None
       if len(args.columns) > 1:
+        # get 2D data
         x = self._get_element(r, args.columns[0])
         y = self._get_element(r, args.columns[1])
         if numpy.isnan(x):
@@ -90,7 +93,11 @@ class Data(object):
         if args.xmax < x:
           args.xmax = x
       else:
+        # get just 1D data
         y = self._get_element(r, args.columns[0])
+      # xtick_labels
+      if args.xtick_label_column is not None:
+          label = self._get_element(r, args.xtick_label_column, label_mode=True)
       if numpy.isnan(y):
         continue
       if args.ymin > y:
@@ -111,6 +118,11 @@ class Data(object):
       if self.y is None:
         self.y = []
       self.y.append(y)
+      if label is not None:
+        if self.xtick_labels is None:
+          self.xtick_labels = []
+        self.xtick_labels.append(label)
+    # finally, turn the lists into arrays
     if x is not None:
       self.x = numpy.array(self.x)
     self.y = numpy.array(self.y)
@@ -122,9 +134,12 @@ class Data(object):
     """ reverse the matrix column order for matrix plotting.
     """
     self.matrix = self.matrix[:, ::-1]
-  def _get_element(self, row, i):
+  def _get_element(self, row, i, label_mode=False):
     """ internal method, retrieve value in row located at index.
+    if label_mode is True, just return the element at position i.
     """
+    if label_mode:
+      return row.columns[i]
     try:
       x = float(row.columns[i])
     except ValueError:
@@ -169,6 +184,9 @@ def InitArguments(parser):
   parser.add_argument('--columns', dest='columns', default=None, type=str,
                       help=('two numbers, comma separated, can be reverse '
                             'order, indicates x,y for plotting. 1-based.'))
+  parser.add_argument('--xtick_label_column', type=int,
+                      help=('for plot modes bar and column, using this will '
+                            'allow for the xtick labels to be shown. 1-based.'))
   parser.add_argument('--downsample', default=None, type=int,
                       help=('Randomly sample only n values from each input. '
                             'Can help cutdown on runtime and output size '
@@ -338,6 +356,11 @@ def CheckArguments(args, parser):
     parser.error('--contour_bin must be greater than 3.')
   DefineColors(args)
   DefineColumns(args, parser)
+  if args.xtick_label_column is not None:
+    args.xtick_label_column -= 1
+    if args.xtick_label_column in args.columns:
+      parser.error('--xtick_label_column %d appears in --columns %s.' %
+                   (args.xtick_label_column, str(args.columns)))
   if args.random_seed is not None and args.jitter:
     numpy.random.seed(seed=args.random_seed)
   if args.random_seed is not None and args.downsample:
@@ -931,6 +954,10 @@ def PlotColumns(data_list, ax, args):
   args.ymin = ymin
   args.ymax = ymax
   ax.set_ylim([ymin, ymax])
+  if args.xtick_label_column is not None:
+    ax.xaxis.set_ticks(numpy.arange(0, len(data.xtick_labels)) + 0.5)
+    ax.xaxis.set_ticklabels(data.xtick_labels, rotation=35,
+                            horizontalalignment='right')
   args.xmin = xmin
   args.xmax = xmax
   ax.set_xlim([xmin, xmax])
