@@ -578,7 +578,7 @@ def WriteImage(fig, pdf, args):
 
 
 def ColorPicker(i, args):
-  """ Returns a valid matplotlib color based on the index, plot mode & palette.
+  """ Returns a valid matplotlib color based on the index, plot mode and palette.
 
   Args:
     i: index, integer
@@ -925,11 +925,15 @@ def PlotColumns(data_list, ax, args):
                    alpha=1.0)
     ax.xaxis.set_ticklabels([])
   xmin, xmax, ymin, ymax = ax.axis()
+  xmin, xmax = HandleLimits(xmin, xmax, args.user_xmin, args.user_xmax)
   ymin, ymax = HandleLimits(min(0.0, data_min), ymax,
                             args.user_ymin, args.user_ymax)
   args.ymin = ymin
   args.ymax = ymax
   ax.set_ylim([ymin, ymax])
+  args.xmin = xmin
+  args.xmax = xmax
+  ax.set_xlim([xmin, xmax])
 
 
 def GetTickYValues(i, args):
