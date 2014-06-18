@@ -955,7 +955,7 @@ def PlotColumns(data_list, ax, args):
   args.ymax = ymax
   ax.set_ylim([ymin, ymax])
   if args.xtick_label_column is not None:
-    ax.xaxis.set_ticks(numpy.arange(0, len(data.xtick_labels)) + 0.5)
+    ax.xaxis.set_ticks(numpy.arange(0, len(data.xtick_labels)) + width / 2.)
     ax.xaxis.set_ticklabels(data.xtick_labels, rotation=35,
                             horizontalalignment='right')
   args.xmin = xmin
