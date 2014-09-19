@@ -355,8 +355,8 @@ def CheckArguments(args, parser):
   args.ymin = sys.maxint
   if args.contour_bin < 3:
     parser.error('--contour_bin must be greater than 3.')
-  DefineColors(args)
-  DefineColumns(args, parser)
+  DefineColors(parser, args)
+  DefineColumns(parser, args)
   if args.xtick_label_column is not None:
     args.xtick_label_column -= 1
     if args.xtick_label_column in args.columns:
@@ -372,7 +372,7 @@ def CheckArguments(args, parser):
                  'or greater than 1')
 
 
-def DefineColumns(args, parser):
+def DefineColumns(parser, args):
   """ Based on --columns, define columns to use for plotting.
 
   Args:
@@ -401,7 +401,7 @@ def DefineColumns(args, parser):
     args.columns.append(columns[i] - 1)
 
 
-def DefineColors(args):
+def DefineColors(parser, args):
   """ Based on --colors, define the set of colors to use in the plot.
 
   Args:
