@@ -131,6 +131,7 @@ class Data(object):
       sys.stderr.write(
         'Bad input when trying to process file %s at column %d on line %d: %s\n'
         % (self.label, i, row.line_number, ' '.join(row.columns)))
+      raise
     return x
   def _create_matrix(self, args):
     """ inspect self.rows and try to create a single data matrix from all input.
